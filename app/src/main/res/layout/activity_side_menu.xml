@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    tools:context=".Side_Menu">
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="391dp"
+        android:layout_height="38dp"
+        android:background="@color/pink"
+        android:backgroundTint="@color/pink"
+        android:orientation="horizontal"
+        android:padding="1sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/sidemenu"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_weight="1"
+            android:padding="1sp"
+            app:srcCompat="@drawable/baseline_menu_24" />
+
+        <Space
+            android:layout_width="230dp"
+            android:layout_height="38dp"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/imageView6"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_weight="1"
+            android:padding="1sp"
+            app:srcCompat="@drawable/outline_notifications_24" />
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_weight="1"
+            android:padding="1sp"
+            app:srcCompat="@drawable/outline_settings_24" />
+
+    </LinearLayout>
+
+    <TableLayout
+        android:layout_width="252dp"
+        android:layout_height="0dp"
+        android:background="@color/gray"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintVertical_bias="0.0">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/imageView13"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="6sp"
+                android:padding="5sp"
+                app:srcCompat="@drawable/home" />
+
+            <TextView
+                android:id="@+id/sidemenu_home"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:padding="9sp"
+                android:text="@string/home"
+                android:textColor="@color/white"
+                android:textSize="24sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/imageView14"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="6sp"
+                android:padding="5sp"
+                app:srcCompat="@drawable/book" />
+
+            <TextView
+                android:id="@+id/sidemenu_Notebook"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:padding="9sp"
+                android:text="@string/notebook"
+                android:textColor="@color/white"
+                android:textSize="24sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/imageView15"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="6sp"
+                android:padding="5sp"
+                app:srcCompat="@drawable/quiz__2_" />
+
+            <TextView
+                android:id="@+id/sidemenu_Quizzes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:padding="9sp"
+                android:text="@string/quizzes"
+                android:textColor="@color/white"
+                android:textSize="24sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/imageView16"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="6sp"
+                android:padding="5sp"
+                app:srcCompat="@drawable/cards__1_" />
+
+            <TextView
+                android:id="@+id/sidemenu_Flashcards"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:padding="9sp"
+                android:text="@string/flashcards"
+                android:textColor="@color/white"
+                android:textSize="24sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/imageView18"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="6sp"
+                android:padding="5sp"
+                app:srcCompat="@drawable/notes" />
+
+            <TextView
+                android:id="@+id/sidemenu_Strips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:padding="9sp"
+                android:text="@string/strips"
+                android:textColor="@color/white"
+                android:textSize="24sp" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/imageView19"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="6sp"
+                android:padding="5sp"
+                app:srcCompat="@drawable/communication" />
+
+            <TextView
+                android:id="@+id/sidemenu_ToF"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:padding="9sp"
+                android:text="@string/ToF"
+                android:textColor="@color/white"
+                android:textSize="24sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/imageView26"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="6sp"
+                android:padding="5sp"
+                app:srcCompat="@drawable/highlighter" />
+
+            <TextView
+                android:id="@+id/sidemenu_Matching"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:padding="9sp"
+                android:text="@string/matching"
+                android:textColor="@color/white"
+                android:textSize="24sp" />
+        </TableRow>
+
+    </TableLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,448 @@
+package com.example.adet;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+public class Strips extends AppCompatActivity {
+
+    private ImageView ekis, sidemenu, correct, wrong;
+    private ImageView s1, s2, s3, s4, s5, s6, s7;
+    private TextView test, stripQuestion, shownAnswer, WCounter, CCounter;
+    private ConstraintLayout invisConstrain;
+    private Button showAnswer;
+
+    private int cCounter = 0;
+    private int wCounter = 0;
+
+    Intent theIntent;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_strips);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
+        theIntent = getIntent();
+        ekis = findViewById(R.id.Eks);
+        sidemenu = findViewById(R.id.sidemenu);
+        test = findViewById(R.id.textView4);
+        invisConstrain = findViewById(R.id.constraintLayout4);
+        stripQuestion = findViewById(R.id.stripQuestion);
+        showAnswer = findViewById(R.id.showAnswer);
+        shownAnswer = findViewById(R.id.shownAnswer);
+        correct = findViewById(R.id.correct1);
+        wrong = findViewById(R.id.wrong1);
+        CCounter = findViewById(R.id.Ccounter);
+        WCounter = findViewById(R.id.Wcounter);
+
+        s1 = findViewById(R.id.strip1);
+        s2 = findViewById(R.id.strip2);
+        s3 = findViewById(R.id.strip3);
+        s4 = findViewById(R.id.strip4);
+        s5 = findViewById(R.id.strip5);
+        s6 = findViewById(R.id.strip6);
+        s7 = findViewById(R.id.strip7);
+
+        ekis.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Strips.this, Exit_Notice.class);
+                startActivity(intent);
+            }
+        });
+        sidemenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Strips.this, Side_Menu.class);
+                startActivity(intent);
+            }
+        });
+
+        JSONArray Defs = readJsonDef();
+        JSONArray Term = readJsonTerm();
+
+        try {
+            for (int i = 0; i < Defs.length(); i++) {
+                Object element = Defs.get(i);
+                Object element1 = Term.get(i);
+                if (element instanceof String) {
+                    String stringValue = (String) element;
+                    String stringValue1 = (String) element1;
+                    if (i == 0) {
+                        s1.setVisibility(View.VISIBLE);
+                        s1.setClickable(true);
+                        s1.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                invisConstrain.setVisibility(View.VISIBLE);
+                                test.setVisibility(View.INVISIBLE);
+                                showAnswer.setVisibility(View.VISIBLE);
+                                s1.setVisibility(View.INVISIBLE);
+                                s1.setClickable(false);
+                                showAnswer.setClickable(true);
+                                showAnswer.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        showAnswer.setBackgroundColor(getResources().getColor(R.color.blue_green));
+                                        showAnswer.setClickable(false);
+                                        shownAnswer.setVisibility(View.VISIBLE);
+                                        correct.setAlpha(1f);
+                                        wrong.setAlpha(1f);
+                                        correct.setClickable(true);
+                                        wrong.setClickable(true);
+                                        shownAnswer.setText(stringValue1);
+                                    }
+                                });
+                                stripQuestion.setText(stringValue);
+                            }
+                        });
+                    }
+                    else if (i == 1) {
+                        s2.setVisibility(View.VISIBLE);
+                        s2.setClickable(true);
+                        s2.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                invisConstrain.setVisibility(View.VISIBLE);
+                                test.setVisibility(View.INVISIBLE);
+                                showAnswer.setVisibility(View.VISIBLE);
+                                s2.setVisibility(View.INVISIBLE);
+                                s2.setClickable(false);
+                                showAnswer.setClickable(true);
+                                showAnswer.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        showAnswer.setBackgroundColor(getResources().getColor(R.color.blue_green));
+                                        showAnswer.setClickable(false);
+                                        shownAnswer.setVisibility(View.VISIBLE);
+                                        correct.setAlpha(1f);
+                                        wrong.setAlpha(1f);
+                                        correct.setClickable(true);
+                                        wrong.setClickable(true);
+                                        shownAnswer.setText(stringValue1);
+                                    }
+                                });
+                                stripQuestion.setText(stringValue);
+                            }
+                        });
+                    }
+                    else if (i == 2) {
+                        s3.setVisibility(View.VISIBLE);
+                        s3.setClickable(true);
+                        s3.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                invisConstrain.setVisibility(View.VISIBLE);
+                                test.setVisibility(View.INVISIBLE);
+                                showAnswer.setVisibility(View.VISIBLE);
+                                s3.setVisibility(View.INVISIBLE);
+                                s3.setClickable(false);
+                                showAnswer.setClickable(true);
+                                showAnswer.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        showAnswer.setBackgroundColor(getResources().getColor(R.color.blue_green));
+                                        showAnswer.setClickable(false);
+                                        shownAnswer.setVisibility(View.VISIBLE);
+                                        correct.setAlpha(1f);
+                                        wrong.setAlpha(1f);
+                                        correct.setClickable(true);
+                                        wrong.setClickable(true);
+                                        shownAnswer.setText(stringValue1);
+                                    }
+                                });
+                                stripQuestion.setText(stringValue);
+                            }
+                        });
+                        }
+                    else if (i == 3) {
+                        s4.setVisibility(View.VISIBLE);
+                        s4.setClickable(true);
+                        s4.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                invisConstrain.setVisibility(View.VISIBLE);
+                                test.setVisibility(View.INVISIBLE);
+                                showAnswer.setVisibility(View.VISIBLE);
+                                s4.setVisibility(View.INVISIBLE);
+                                s4.setClickable(false);
+                                showAnswer.setClickable(true);
+                                showAnswer.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        showAnswer.setBackgroundColor(getResources().getColor(R.color.blue_green));
+                                        showAnswer.setClickable(false);
+                                        shownAnswer.setVisibility(View.VISIBLE);
+                                        correct.setAlpha(1f);
+                                        wrong.setAlpha(1f);
+                                        correct.setClickable(true);
+                                        wrong.setClickable(true);
+                                        shownAnswer.setText(stringValue1);
+                                    }
+                                });
+                                stripQuestion.setText(stringValue);
+                            }
+                        });
+                    }
+                    else if (i == 4) {
+                        s5.setVisibility(View.VISIBLE);
+                        s5.setClickable(true);
+                        s5.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                invisConstrain.setVisibility(View.VISIBLE);
+                                test.setVisibility(View.INVISIBLE);
+                                showAnswer.setVisibility(View.VISIBLE);
+                                s5.setVisibility(View.INVISIBLE);
+                                s5.setClickable(false);
+                                showAnswer.setClickable(true);
+                                showAnswer.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        showAnswer.setBackgroundColor(getResources().getColor(R.color.blue_green));
+                                        showAnswer.setClickable(false);
+                                        shownAnswer.setVisibility(View.VISIBLE);
+                                        correct.setAlpha(1f);
+                                        wrong.setAlpha(1f);
+                                        correct.setClickable(true);
+                                        wrong.setClickable(true);
+                                        shownAnswer.setText(stringValue1);
+                                    }
+                                });
+                                stripQuestion.setText(stringValue);
+                            }
+                        });
+                    }
+                    else if (i == 5) {
+                        s6.setVisibility(View.VISIBLE);
+                        s6.setClickable(true);
+                        s6.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                invisConstrain.setVisibility(View.VISIBLE);
+                                test.setVisibility(View.INVISIBLE);
+                                showAnswer.setVisibility(View.VISIBLE);
+                                s6.setVisibility(View.INVISIBLE);
+                                s6.setClickable(false);
+                                showAnswer.setClickable(true);
+                                showAnswer.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        showAnswer.setBackgroundColor(getResources().getColor(R.color.blue_green));
+                                        showAnswer.setClickable(false);
+                                        shownAnswer.setVisibility(View.VISIBLE);
+                                        correct.setAlpha(1f);
+                                        wrong.setAlpha(1f);
+                                        correct.setClickable(true);
+                                        wrong.setClickable(true);
+                                        shownAnswer.setText(stringValue1);
+                                    }
+                                });
+                                stripQuestion.setText(stringValue);
+                            }
+                        });
+                        }
+                    else if (i == 6) {
+                        s7.setVisibility(View.VISIBLE);
+                        s7.setClickable(true);
+                        s7.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                invisConstrain.setVisibility(View.VISIBLE);
+                                test.setVisibility(View.INVISIBLE);
+                                showAnswer.setVisibility(View.VISIBLE);
+                                s7.setVisibility(View.INVISIBLE);
+                                s7.setClickable(false);
+                                showAnswer.setClickable(true);
+                                showAnswer.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        showAnswer.setBackgroundColor(getResources().getColor(R.color.blue_green));
+                                        showAnswer.setClickable(false);
+                                        shownAnswer.setVisibility(View.VISIBLE);
+                                        correct.setAlpha(1f);
+                                        wrong.setAlpha(1f);
+                                        correct.setClickable(true);
+                                        wrong.setClickable(true);
+                                        shownAnswer.setText(stringValue1);
+                                    }
+                                });
+                                stripQuestion.setText(stringValue);
+                            }
+                        });
+                    }
+                    else {
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        correct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cCounter++;
+                CCounter.setText(String.valueOf(cCounter));
+                invisConstrain.setVisibility(View.INVISIBLE);
+                showAnswer.setVisibility(View.INVISIBLE);
+                shownAnswer.setVisibility(View.INVISIBLE);
+                correct.setAlpha(0.5f);
+                wrong.setAlpha(0.5f);
+                correct.setClickable(false);
+                wrong.setClickable(false);
+            }
+        });
+        wrong.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                wCounter++;
+                WCounter.setText(String.valueOf(wCounter));
+                invisConstrain.setVisibility(View.INVISIBLE);
+                showAnswer.setVisibility(View.INVISIBLE);
+                shownAnswer.setVisibility(View.INVISIBLE);
+                correct.setAlpha(0.5f);
+                wrong.setAlpha(0.5f);
+                correct.setClickable(false);
+                wrong.setClickable(false);
+            }
+        });
+
+    }
+    private JSONArray readJsonTerm() {
+        try {
+            InputStream inputStream = getAssets().open("sample.json");
+            int size = inputStream.available();
+            byte[] buffer = new byte[size];
+            inputStream.read(buffer);
+            inputStream.close();
+
+            String json;
+
+            json = new String(buffer, StandardCharsets.UTF_8);
+
+            return parseJsonTerm(json);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    private JSONArray parseJsonTerm(String jsonString) {
+        try {
+            JSONObject jsonObject = new JSONObject(jsonString);
+            JSONArray allTerm = new JSONArray();
+
+            // Extract the "Title"
+            String title = jsonObject.getString("Title");
+
+
+            // Get the "Content" array
+            JSONArray contentArray = jsonObject.getJSONArray("Content");
+
+            // Iterate through the "Content" array
+            for (int i = 0; i < contentArray.length(); i++) {
+                JSONObject sectionObject = contentArray.getJSONObject(i);
+                String sectionName = sectionObject.getString("Section");
+
+                if (sectionName.equals(theIntent.getStringExtra("title"))) {
+                    JSONArray itemArray = sectionObject.getJSONArray("Item");
+                    for (int j = 0; j < itemArray.length(); j++) {
+                        JSONObject itemObject = itemArray.getJSONObject(j);
+                        allTerm.put(itemObject.getString("Term"));
+                    }
+                    break;
+                }
+
+
+            }
+            return allTerm;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    private JSONArray readJsonDef() {
+        try {
+            InputStream inputStream = getAssets().open("sample.json");
+            int size = inputStream.available();
+            byte[] buffer = new byte[size];
+            inputStream.read(buffer);
+            inputStream.close();
+
+            String json;
+
+            json = new String(buffer, StandardCharsets.UTF_8);
+
+            return parseJsonDef(json);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    private JSONArray parseJsonDef(String jsonString) {
+        try {
+            JSONObject jsonObject = new JSONObject(jsonString);
+            JSONArray allDef = new JSONArray();
+
+            // Extract the "Title"
+            String title = jsonObject.getString("Title");
+
+
+            // Get the "Content" array
+            JSONArray contentArray = jsonObject.getJSONArray("Content");
+
+            // Iterate through the "Content" array
+            for (int i = 0; i < contentArray.length(); i++) {
+                JSONObject sectionObject = contentArray.getJSONObject(i);
+                String sectionName = sectionObject.getString("Section");
+
+                if (sectionName.equals(theIntent.getStringExtra("title"))) {
+                    JSONArray itemArray = sectionObject.getJSONArray("Item");
+                    for (int j = 0; j < itemArray.length(); j++) {
+                        JSONObject itemObject = itemArray.getJSONObject(j);
+                        allDef.put(itemObject.getString("Definition"));
+                    }
+                    break;
+                }
+
+
+            }
+            return allDef;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+}
