@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "406699433216",
+    "project_id": "reviewspheredb",
+    "storage_bucket": "reviewspheredb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:406699433216:android:a3c3ed5e177f149189a7e5",
+        "android_client_info": {
+          "package_name": "com.example.adet"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMMPyRSmzk3yq2RUd5vy0GIRp-hjcbgQU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

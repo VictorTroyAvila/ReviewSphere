@@ -13,6 +13,9 @@
         android:theme="@style/Theme.ADET"
         tools:targetApi="31">
         <activity
+            android:name=".Wheel"
+            android:exported="false" />
+        <activity
             android:name=".TrueOrFalse"
             android:exported="false" />
         <activity
