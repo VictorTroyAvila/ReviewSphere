@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <array name="preloaded_fonts" translatable="false">
+        <item>@font/akronim</item>
         <item>@font/inter</item>
         <item>@font/inter_bold</item>
         <item>@font/inter_thin</item>
+        <item>@font/jomhuria</item>
+        <item>@font/mansalva</item>
         <item>@font/orbitron</item>
     </array>
 </resources>

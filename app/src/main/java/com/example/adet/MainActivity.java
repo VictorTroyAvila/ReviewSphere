@@ -13,8 +13,6 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button start_btn;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,13 +24,5 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        start_btn = findViewById(R.id.start_btn);
-        start_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, Home.class);
-                startActivity(intent);
-            }
-        });
     }
 }
