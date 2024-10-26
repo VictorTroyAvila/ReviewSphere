@@ -117,6 +117,7 @@ public class TrueOrFalse extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(TrueOrFalse.this, Exit_Notice.class);
                 startActivity(intent);
+                finish();
             }
         });
         sidemenu.setOnClickListener(new View.OnClickListener() {

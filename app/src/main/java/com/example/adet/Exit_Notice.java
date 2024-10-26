@@ -46,6 +46,7 @@ public class Exit_Notice extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(Exit_Notice.this, Home.class);
                 startActivity(intent);
+                finish();
             }
         });
 

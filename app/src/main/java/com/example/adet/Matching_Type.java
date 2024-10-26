@@ -120,6 +120,7 @@ public class Matching_Type extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(Matching_Type.this, Exit_Notice.class);
                 startActivity(intent);
+                finish();
             }
         });
         sidemenu.setOnClickListener(new View.OnClickListener() {

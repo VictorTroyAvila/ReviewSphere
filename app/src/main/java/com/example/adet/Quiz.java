@@ -204,6 +204,7 @@ public class Quiz extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(Quiz.this, Exit_Notice.class);
                 startActivity(intent);
+                finish();
             }
         });
         sidemenu.setOnClickListener(new View.OnClickListener() {

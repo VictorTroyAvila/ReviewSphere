@@ -35,6 +35,7 @@ public class Side_Menu extends AppCompatActivity {
             public void onClick(View v) {
                 Intent homeIntent = new Intent(Side_Menu.this, Home.class);
                 startActivity(homeIntent);
+                finish();
             }
         });
 
@@ -44,6 +45,7 @@ public class Side_Menu extends AppCompatActivity {
             public void onClick(View v) {
                 Intent notebookIntent = new Intent(Side_Menu.this, Notebook.class);
                 startActivity(notebookIntent);
+                finish();
             }
         });
 
@@ -53,6 +55,7 @@ public class Side_Menu extends AppCompatActivity {
             public void onClick(View v) {
                 intent.putExtra("title", "Quizzes");
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -62,6 +65,7 @@ public class Side_Menu extends AppCompatActivity {
             public void onClick(View v) {
                 intent.putExtra("title", "Flashcards");
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -71,6 +75,7 @@ public class Side_Menu extends AppCompatActivity {
             public void onClick(View v) {
                 intent.putExtra("title", "Strips");
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -80,6 +85,7 @@ public class Side_Menu extends AppCompatActivity {
             public void onClick(View v) {
                 intent.putExtra("title", "ToF");
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -89,6 +95,7 @@ public class Side_Menu extends AppCompatActivity {
             public void onClick(View v) {
                 intent.putExtra("title", "Matching");
                 startActivity(intent);
+                finish();
             }
         });
 

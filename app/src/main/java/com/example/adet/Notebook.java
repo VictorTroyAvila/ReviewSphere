@@ -85,6 +85,7 @@ public class Notebook extends AppCompatActivity {
                             Intent intent = new Intent(Notebook.this, Notebook_Data.class);
                             intent.putExtra("title", stringValue);
                             startActivity(intent);
+                            finish();
                         }
                     });
                 }

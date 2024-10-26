@@ -127,6 +127,7 @@ public class Flashcards extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(Flashcards.this, Exit_Notice.class);
                 startActivity(intent);
+                finish();
             }
         });
 

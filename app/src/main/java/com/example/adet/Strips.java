@@ -74,6 +74,7 @@ public class Strips extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(Strips.this, Exit_Notice.class);
                 startActivity(intent);
+                finish();
             }
         });
         sidemenu.setOnClickListener(new View.OnClickListener() {

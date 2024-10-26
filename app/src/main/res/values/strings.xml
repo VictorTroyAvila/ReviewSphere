@@ -49,5 +49,6 @@
     <string name="forgotpass">Forgot Password?</string>
     <string name="noacc">Don\'t have an account?</string>
     <string name="yesacc">You already have an account?</string>
-    <string name="username">Username</string>
+    <string name="username">Lastname, Firstname</string>
+    <string name="addinfo">Additional \n Information</string>
 </resources>

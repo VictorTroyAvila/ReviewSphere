@@ -53,7 +53,7 @@
             android:name=".Loading_Screen"
             android:exported="false" />
         <activity
-            android:name=".Score_Success"
+            android:name=".AddInfo"
             android:exported="false" />
         <activity
             android:name=".Exit_Notice"

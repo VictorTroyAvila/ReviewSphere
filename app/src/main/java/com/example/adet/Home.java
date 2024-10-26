@@ -44,6 +44,7 @@ public class Home extends AppCompatActivity {
                 Intent intent = new Intent(Home.this, Topic_Selection.class);
                 intent.putExtra("title", "Flashcards");
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -53,6 +54,7 @@ public class Home extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(Home.this, Notebook.class);
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -63,6 +65,7 @@ public class Home extends AppCompatActivity {
                 Intent intent = new Intent(Home.this, Topic_Selection.class);
                 intent.putExtra("title", "Quizzes");
                 startActivity(intent);
+                finish();
             }
         });
     }
