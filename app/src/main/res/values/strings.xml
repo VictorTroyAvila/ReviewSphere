@@ -57,8 +57,15 @@
         <item>Prefer not to say</item>
     </string-array>
     <string-array name="gradelevel">
-        <item>Junior High School</item>
-        <item>Senior High School</item>
-        <item>College</item>
+        <item>Grade 7</item>
+        <item>Grade 8</item>
+        <item>Grade 9</item>
+        <item>Grade 10</item>
+        <item>Grade 11</item>
+        <item>Grade 12</item>
+        <item>1st Year College</item>
+        <item>2nd Year College</item>
+        <item>3rd Year College</item>
+        <item>4th Year College</item>
     </string-array>
 </resources>
