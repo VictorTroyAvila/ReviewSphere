@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onCheckComplete(boolean exists) {
                         // Handle the result here
                         if (exists) {
-                            Intent intent = new Intent(MainActivity.this, Notebook.class);
+                            Intent intent = new Intent(MainActivity.this, Home.class);
                             startActivity(intent);
                         }
                         else

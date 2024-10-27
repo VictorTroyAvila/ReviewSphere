@@ -49,6 +49,16 @@
     <string name="forgotpass">Forgot Password?</string>
     <string name="noacc">Don\'t have an account?</string>
     <string name="yesacc">You already have an account?</string>
-    <string name="username">Lastname, Firstname</string>
+    <string name="username">Full Name</string>
     <string name="addinfo">Additional \n Information</string>
+    <string-array name="gender">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Prefer not to say</item>
+    </string-array>
+    <string-array name="gradelevel">
+        <item>Junior High School</item>
+        <item>Senior High School</item>
+        <item>College</item>
+    </string-array>
 </resources>

@@ -57,6 +57,7 @@
         android:inputType="textEmailAddress"
         android:paddingLeft="20dp"
         android:paddingTop="10dp"
+        android:paddingRight="20dp"
         android:paddingBottom="10dp"
         android:textColorHint="@color/faded_white"
         android:textSize="24sp"
@@ -78,6 +79,7 @@
         android:inputType="textPassword"
         android:paddingLeft="20dp"
         android:paddingTop="10dp"
+        android:paddingRight="20dp"
         android:paddingBottom="10dp"
         android:textColorHint="@color/faded_white"
         android:textSize="24sp"
@@ -98,6 +100,7 @@
         android:inputType="text"
         android:paddingLeft="20dp"
         android:paddingTop="10dp"
+        android:paddingRight="20dp"
         android:paddingBottom="10dp"
         android:textColorHint="@color/faded_white"
         android:textSize="24sp"
@@ -134,7 +137,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/toAddInfo"
+        android:id="@+id/toLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="112dp"
