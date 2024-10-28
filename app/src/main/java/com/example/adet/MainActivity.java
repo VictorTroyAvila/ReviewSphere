@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
                         if (exists) {
                             Intent intent = new Intent(MainActivity.this, Home.class);
                             startActivity(intent);
+                            finish();
                         }
                         else
                         {
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                     for (DataSnapshot childSnapshot : task.getResult().getChildren()) {
                         if (childSnapshot.getKey().equalsIgnoreCase(NameText)) {
                             if (childSnapshot.child("Email").getValue().toString().equalsIgnoreCase(EmailText)) {
-                                if (childSnapshot.child("Password").getValue().toString().equalsIgnoreCase(PasswordText)) {
+                                if (childSnapshot.child("Password").getValue().toString().equals(PasswordText)) {
                                     exist = true;
                                 }
                             }
