@@ -2,32 +2,42 @@ package com.example.adet;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Notebook extends AppCompatActivity {
 
     private LinearLayout content_Container;
     private ImageView goto_sidemenu;
+    private Button Add, Edit, Delete;
+    private Intent theIntent;
+
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference myRef = database.getReference("Name List");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +50,40 @@ public class Notebook extends AppCompatActivity {
             return insets;
         });
 
+        theIntent = getIntent();
         content_Container = findViewById(R.id.item_list);
         goto_sidemenu = findViewById(R.id.sidemenu);
+        Add = findViewById(R.id.notebookAdd);
+        Edit = findViewById(R.id.notebookEdit);
+        Delete = findViewById(R.id.notebookDelete);
+
+        //Display all data
+        myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot childSnapshot : snapshot.getChildren())
+                {
+                    String key = childSnapshot.getKey();
+
+                    TextView textView = new TextView(Notebook.this);
+                    textView.setText("Subject: " + key);
+
+                    textView.setBackground(getResources().getDrawable(R.drawable.rounding_corner_lite));
+                    textView.setBackgroundColor(getResources().getColor(R.color.faded_purple));
+                    textView.setPadding(10, 10, 10, 10);
+                    textView.setTextSize(20);
+
+                    content_Container.addView(textView);
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         goto_sidemenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -50,171 +92,95 @@ public class Notebook extends AppCompatActivity {
             }
         });
 
-        String title = readJsonTitle();
-        JSONArray section = readJsonSection();
-        int noTerms;
+        Add.setOnClickListener(v -> {
+            // Inflate the custom layout
+            LayoutInflater inflater = getLayoutInflater();
+            View dialogView = inflater.inflate(R.layout.dialog_addnote, null);
 
-        try {
-            for (int i = 0; i < section.length(); i++) {
-                Object element = section.get(i);
-                noTerms = readJsonNoTerms(i);
-                if (element instanceof String) {
-                    String stringValue = (String) element;
+            // Create an AlertDialog.Builder
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-                    TextView textView = new TextView(this);
-                    textView.setText("Title: " + stringValue +
-                            "\n Items: " + noTerms +
-                            "\n Tag: " + title);
-                    textView.setId(View.generateViewId());
-                    textView.setTextSize(16);
-                    textView.setBackground(getResources().getDrawable(R.drawable.rounding_corner));
-                    textView.setBackgroundColor(getResources().getColor(R.color.faded_purple));
-                    textView.setPadding(32, 32, 32, 32);
-                    content_Container.addView(textView);
+            // Set the custom view
+            builder.setView(dialogView);
 
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                    );
-                    params.setMargins(16, 16, 16, 16);
-                    textView.setLayoutParams(params);
+            // Get references to UI elements
+            EditText subjectTitle = dialogView.findViewById(R.id.dialog_edit_text);
+            EditText topicTitle = dialogView.findViewById(R.id.dialog_edit_text2);
+            Button submitButton = dialogView.findViewById(R.id.dialog_submit);
 
-                    textView.setOnClickListener(new View.OnClickListener() {
+            // Show the dialog
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+            // Set button click listener
+            submitButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    String SubjectTitle = subjectTitle.getText().toString();
+                    String TopicTitle = topicTitle.getText().toString();
+
+                    Map<String, Object> definition = new HashMap<>();
+                    definition.put("Filler", "Filler");
+
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("Filler", definition);
+
+                    Map<String, Object> item = new HashMap<>();
+                    item.put("Items", data);
+
+                    Map<String, Object> Topic = new HashMap<>();
+                    Topic.put(TopicTitle, item);
+
+                    Map<String, Object> subject = new HashMap<>();
+                    subject.put(SubjectTitle, Topic);
+
+                    Checking( new CheckCallback() {
                         @Override
-                        public void onClick(View v) {
-                            Intent intent = new Intent(Notebook.this, Notebook_Data.class);
-                            intent.putExtra("title", stringValue);
-                            startActivity(intent);
+                        public void onCheckComplete(boolean exists) {
+                            // Handle the result here
+                            if (exists) {
+                                myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(SubjectTitle).setValue(Topic);
+                            }
+                            else
+                            {
+                                myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").setValue(subject);
+                            }
                         }
                     });
+
+                    dialog.dismiss();
+                }
+            });
+        });
+
+        Edit.setOnClickListener(v -> {
+
+        });
+
+        Delete.setOnClickListener(v -> {
+
+        });
+    }
+
+    private void Checking(CheckCallback callback) {
+        myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (task.isSuccessful()) {
+                    boolean exist = false;
+                    for (DataSnapshot childSnapshot : task.getResult().getChildren()) {
+                        if (childSnapshot.child("Notebook").exists())
+                        {
+                            exist = true;
+                        }
+                    }
+                    callback.onCheckComplete(exist);
+                } else {
+                    callback.onCheckComplete(false); // Handle error
                 }
             }
-        } catch (JSONException e) {
-            // Handle exception
-        }
-
-
-    }
-
-    private JSONArray readJsonSection() {
-        try {
-            InputStream inputStream = getAssets().open("sample.json");
-            int size = inputStream.available();
-            byte[] buffer = new byte[size];
-            inputStream.read(buffer);
-            inputStream.close();
-
-            String json;
-
-            json = new String(buffer, StandardCharsets.UTF_8);
-
-            return parseJsonSection(json);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    private JSONArray parseJsonSection(String jsonString) {
-        try {
-            JSONObject jsonObject = new JSONObject(jsonString);
-            JSONArray allSections = new JSONArray();
-
-            // Extract the "Title"
-            String title = jsonObject.getString("Title");
-
-
-            // Get the "Content" array
-            JSONArray contentArray = jsonObject.getJSONArray("Content");
-
-            // Iterate through the "Content" array
-            for (int i = 0; i < contentArray.length(); i++) {
-                JSONObject contentObject = contentArray.getJSONObject(i);
-
-                // Extract the "Section"
-                allSections.put(contentObject.getString("Section"));
-
-            }
-            return allSections;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    private int readJsonNoTerms(int index) {
-        try {
-            InputStream inputStream = getAssets().open("sample.json");
-            int size = inputStream.available();
-            byte[] buffer = new byte[size];
-            inputStream.read(buffer);
-            inputStream.close();
-
-            String json;
-
-            json = new String(buffer, StandardCharsets.UTF_8);
-
-            return parseJsonNoTerms(json, index);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return -1;
-        }
-    }
-    private int parseJsonNoTerms(String jsonString, int index) {
-        try {
-            JSONObject jsonObject = new JSONObject(jsonString);
-            JSONArray contentArray = jsonObject.getJSONArray("Content");
-
-            List<Integer> definitionIndices = new ArrayList<>();
-            int indexCounter = 0;
-            for (int i = 0; i < contentArray.length(); i++) {
-                JSONObject sectionObject = contentArray.getJSONObject(i);
-                String sectionName = sectionObject.getString("Section");
-                JSONArray itemArray = sectionObject.getJSONArray("Item");
-                int termCount = itemArray.length();
-                definitionIndices.add(termCount);
-                indexCounter ++;
-            }
-
-            return definitionIndices.get(index);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return 0;
-        }
-    }
-    private String readJsonTitle() {
-        try {
-            InputStream inputStream = getAssets().open("sample.json");
-            int size = inputStream.available();
-            byte[] buffer = new byte[size];
-            inputStream.read(buffer);
-            inputStream.close();
-
-            String json;
-
-            json = new String(buffer, StandardCharsets.UTF_8);
-
-            return parseJsonTitle(json);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    private String parseJsonTitle(String jsonString) {
-        try {
-            JSONObject jsonObject = new JSONObject(jsonString);
-
-            // Extract the "Title"
-            String title = jsonObject.getString("Title");
-
-            return title;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        });
     }
 
 }

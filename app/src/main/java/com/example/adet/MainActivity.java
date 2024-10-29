@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
                         // Handle the result here
                         if (exists) {
                             Intent intent = new Intent(MainActivity.this, Home.class);
+                            intent.putExtra("Fname", NameText);
                             startActivity(intent);
                             finish();
                         }

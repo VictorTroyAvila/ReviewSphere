@@ -23,7 +23,9 @@
     <string name="base">00</string>
     <string name="welcome">Welcome</string>
     <string name="loading">Loading... \n Please wait a moment</string>
-    <string name="add">+</string>
+    <string name="add">ADd</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
     <string name="word_title">Title</string>
     <string name="choose_topic">Choose Topic</string>
     <string name="answer">Answer</string>
@@ -51,6 +53,9 @@
     <string name="yesacc">You already have an account?</string>
     <string name="username">Full Name</string>
     <string name="addinfo">Additional \n Information</string>
+    <string name="subjecttitle">Subject Title</string>
+    <string name="topic">Topic</string>
+
     <string-array name="gender">
         <item>Male</item>
         <item>Female</item>

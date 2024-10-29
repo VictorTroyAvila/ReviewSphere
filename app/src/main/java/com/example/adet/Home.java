@@ -17,6 +17,8 @@ public class Home extends AppCompatActivity {
 
     private ImageView FlashCards, Notebook, Quizzes;
 
+    Intent theIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,6 +29,8 @@ public class Home extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        theIntent = getIntent();
 
         click_menu = findViewById(R.id.sidemenu);
         click_menu.setOnClickListener(new View.OnClickListener() {
@@ -52,6 +56,7 @@ public class Home extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Home.this, Notebook.class);
+                intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
                 startActivity(intent);
             }
         });
