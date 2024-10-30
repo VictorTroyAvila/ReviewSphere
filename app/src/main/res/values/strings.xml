@@ -54,6 +54,7 @@
     <string name="username">Full Name</string>
     <string name="addinfo">Additional \n Information</string>
     <string name="subjecttitle">Subject Title</string>
+    <string name="newsubjecttitle">New Subject Title</string>
     <string name="topic">Topic</string>
 
     <string-array name="gender">

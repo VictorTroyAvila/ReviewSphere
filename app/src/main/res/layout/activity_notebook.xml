@@ -23,7 +23,7 @@
 
         <ImageView
             android:id="@+id/sidemenu"
-            android:layout_width="wrap_content"
+            android:layout_width="60dp"
             android:layout_height="35dp"
             android:layout_weight="1"
             android:padding="1sp"
@@ -31,7 +31,7 @@
 
         <TextView
             android:id="@+id/textView6"
-            android:layout_width="223dp"
+            android:layout_width="291dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/notebook"
@@ -39,21 +39,13 @@
             android:textColor="@color/black"
             android:textSize="24sp" />
 
-        <ImageView
-            android:id="@+id/imageView6"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
+        <View
+            android:id="@+id/divider"
+            android:layout_width="57dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:padding="1sp"
-            app:srcCompat="@drawable/outline_notifications_24" />
-
-        <ImageView
-            android:id="@+id/imageView3"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_weight="1"
-            android:padding="1sp"
-            app:srcCompat="@drawable/outline_settings_24" />
+            android:background="?android:attr/listDivider"
+            android:visibility="invisible" />
 
     </LinearLayout>
 

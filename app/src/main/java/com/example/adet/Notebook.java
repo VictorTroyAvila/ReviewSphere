@@ -29,6 +29,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.security.auth.Subject;
+
 public class Notebook extends AppCompatActivity {
 
     private LinearLayout content_Container;
@@ -61,17 +63,31 @@ public class Notebook extends AppCompatActivity {
         myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                content_Container.removeAllViews();
                 for (DataSnapshot childSnapshot : snapshot.getChildren())
                 {
+
                     String key = childSnapshot.getKey();
 
                     TextView textView = new TextView(Notebook.this);
                     textView.setText("Subject: " + key);
 
-                    textView.setBackground(getResources().getDrawable(R.drawable.rounding_corner_lite));
                     textView.setBackgroundColor(getResources().getColor(R.color.faded_purple));
-                    textView.setPadding(10, 10, 10, 10);
+                    textView.setPadding(20, 20, 20, 20);
                     textView.setTextSize(20);
+
+                    LinearLayout.LayoutParams txtVParams = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                    );
+                    txtVParams.setMargins(16, 16, 16, 0);
+                    textView.setLayoutParams(txtVParams);
+
+                    textView.setOnClickListener(v -> {
+                        Intent intent = new Intent(Notebook.this, Notebook_Data.class);
+                        intent.putExtra("Subject", key);
+                        startActivity(intent);
+                    });
 
                     content_Container.addView(textView);
 
@@ -84,6 +100,7 @@ public class Notebook extends AppCompatActivity {
             }
         });
 
+        //Go to Side menu
         goto_sidemenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,6 +109,7 @@ public class Notebook extends AppCompatActivity {
             }
         });
 
+        //Add Subject and Content
         Add.setOnClickListener(v -> {
             // Inflate the custom layout
             LayoutInflater inflater = getLayoutInflater();
@@ -104,8 +122,8 @@ public class Notebook extends AppCompatActivity {
             builder.setView(dialogView);
 
             // Get references to UI elements
-            EditText subjectTitle = dialogView.findViewById(R.id.dialog_edit_text);
-            EditText topicTitle = dialogView.findViewById(R.id.dialog_edit_text2);
+            EditText subjectTitle = dialogView.findViewById(R.id.dialog_add_subject);
+            EditText topicTitle = dialogView.findViewById(R.id.dialog_add_topic);
             Button submitButton = dialogView.findViewById(R.id.dialog_submit);
 
             // Show the dialog
@@ -135,7 +153,7 @@ public class Notebook extends AppCompatActivity {
                     Map<String, Object> subject = new HashMap<>();
                     subject.put(SubjectTitle, Topic);
 
-                    Checking( new CheckCallback() {
+                    AddChecking(theIntent.getStringExtra("Fname"), new CheckCallback() {
                         @Override
                         public void onCheckComplete(boolean exists) {
                             // Handle the result here
@@ -154,23 +172,146 @@ public class Notebook extends AppCompatActivity {
             });
         });
 
+        //Edit Subject and Content
         Edit.setOnClickListener(v -> {
+            // Inflate the custom layout
+            LayoutInflater inflater = getLayoutInflater();
+            View dialogView = inflater.inflate(R.layout.dialog_editnote, null);
+
+            // Create an AlertDialog.Builder
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+            // Set the custom view
+            builder.setView(dialogView);
+
+            // Get references to UI elements
+            EditText subjectTitle = dialogView.findViewById(R.id.dialog_edit_subject_title);
+            EditText newSubjectTitle = dialogView.findViewById(R.id.dialog_edit_new_subject_title);
+            Button EditButton = dialogView.findViewById(R.id.dialog_edit);
+
+            // Show the dialog
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+            EditButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String SubjectTitle = subjectTitle.getText().toString();
+                    String NewSubjectTitle = newSubjectTitle.getText().toString();
+
+                    EditChecking(theIntent.getStringExtra("Fname"), SubjectTitle, new CheckCallback() {
+                        @Override
+                        public void onCheckComplete(boolean exists) {
+                         if(exists)
+                         {
+                             myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                 @Override
+                                 public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                     if(task.isSuccessful())
+                                     {
+                                         Object data = task.getResult().child(SubjectTitle).getValue();
+                                         myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(NewSubjectTitle).setValue(data);
+                                         myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(SubjectTitle).removeValue();
+                                     }
+                                 }
+                             });
+                         }
+                        }
+                    });
+                    dialog.dismiss();
+                }
+            });
 
         });
 
+        //Delete Subject and Content
         Delete.setOnClickListener(v -> {
+            // Inflate the custom layout
+            LayoutInflater inflater = getLayoutInflater();
+            View dialogView = inflater.inflate(R.layout.dialog_deletenote, null);
 
+            // Create an AlertDialog.Builder
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+            // Set the custom view
+            builder.setView(dialogView);
+
+            // Get references to UI elements
+            EditText subjectTitle = dialogView.findViewById(R.id.dialog_delete_subject_title);
+            Button DeleteButton = dialogView.findViewById(R.id.dialog_delete);
+
+            // Show the dialog
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+            DeleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String SubjectTitle = subjectTitle.getText().toString();
+
+                    DeleteChecking(theIntent.getStringExtra("Fname"), SubjectTitle, new CheckCallback() {
+                        @Override
+                        public void onCheckComplete(boolean exists) {
+                            if (exists)
+                            {
+                                myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(SubjectTitle).removeValue();
+                            }
+                        }
+                    });
+                    dialog.dismiss();
+                }
+            });
         });
     }
 
-    private void Checking(CheckCallback callback) {
-        myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+    private void AddChecking(String Acc, CheckCallback callback) {
+        myRef.child(Acc).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if (task.isSuccessful()) {
                     boolean exist = false;
                     for (DataSnapshot childSnapshot : task.getResult().getChildren()) {
                         if (childSnapshot.child("Notebook").exists())
+                        {
+                            exist = true;
+                        }
+                    }
+                    callback.onCheckComplete(exist);
+                } else {
+                    callback.onCheckComplete(false); // Handle error
+                }
+            }
+        });
+    }
+
+    private void EditChecking(String Acc, String Subject, CheckCallback callback) {
+        myRef.child(Acc).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (task.isSuccessful()) {
+                    boolean exist = false;
+                    for (DataSnapshot childSnapshot : task.getResult().getChildren()) {
+                        if (childSnapshot.child(Subject).exists())
+                        {
+                            exist = true;
+                        }
+                    }
+                    callback.onCheckComplete(exist);
+                } else {
+                    callback.onCheckComplete(false); // Handle error
+                }
+            }
+        });
+    }
+
+    private void DeleteChecking(String Acc, String Subject, CheckCallback callback) {
+        myRef.child(Acc).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (task.isSuccessful()) {
+                    boolean exist = false;
+                    for (DataSnapshot childSnapshot : task.getResult().getChildren()) {
+                        if (childSnapshot.child(Subject).exists())
                         {
                             exist = true;
                         }
