@@ -64,33 +64,44 @@ public class Notebook extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 content_Container.removeAllViews();
-                for (DataSnapshot childSnapshot : snapshot.getChildren())
-                {
+                //Subject
+                for (DataSnapshot subjectSnapshot : snapshot.getChildren()) {
+                    //Topic
+                    for (DataSnapshot topicSnapshot : subjectSnapshot.getChildren()) {
+                        //Items
+                        for (DataSnapshot itemsnapshot : topicSnapshot.getChildren()) {
+                            String Subject = subjectSnapshot.getKey();
+                            String Topic = topicSnapshot.getKey();
+                            long itemCount = itemsnapshot.getChildrenCount();
 
-                    String key = childSnapshot.getKey();
+                            TextView textView = new TextView(Notebook.this);
+                            textView.setText("Topic: " + Topic +
+                                    "\n" + "Items: " + itemCount +
+                                    "\n" + "Subject: " + Subject);
 
-                    TextView textView = new TextView(Notebook.this);
-                    textView.setText("Subject: " + key);
+                            textView.setBackgroundColor(getResources().getColor(R.color.faded_purple));
+                            textView.setPadding(30, 30, 30, 30);
+                            textView.setTextSize(20);
 
-                    textView.setBackgroundColor(getResources().getColor(R.color.faded_purple));
-                    textView.setPadding(20, 20, 20, 20);
-                    textView.setTextSize(20);
+                            LinearLayout.LayoutParams txtVParams = new LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT
+                            );
+                            txtVParams.setMargins(16, 20, 16, 20);
+                            textView.setLayoutParams(txtVParams);
 
-                    LinearLayout.LayoutParams txtVParams = new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                    );
-                    txtVParams.setMargins(16, 16, 16, 0);
-                    textView.setLayoutParams(txtVParams);
+                            textView.setOnClickListener(v -> {
+                                Intent intent = new Intent(Notebook.this, Notebook_Data.class);
+                                intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
+                                intent.putExtra("Subject", Subject);
+                                intent.putExtra("Topic", Topic);
+                                startActivity(intent);
+                            });
 
-                    textView.setOnClickListener(v -> {
-                        Intent intent = new Intent(Notebook.this, Notebook_Data.class);
-                        intent.putExtra("Subject", key);
-                        startActivity(intent);
-                    });
+                            content_Container.addView(textView);
 
-                    content_Container.addView(textView);
-
+                        }
+                    }
                 }
             }
 
@@ -138,11 +149,8 @@ public class Notebook extends AppCompatActivity {
                     String SubjectTitle = subjectTitle.getText().toString();
                     String TopicTitle = topicTitle.getText().toString();
 
-                    Map<String, Object> definition = new HashMap<>();
-                    definition.put("Filler", "Filler");
-
                     Map<String, Object> data = new HashMap<>();
-                    data.put("Filler", definition);
+                    data.put("Term", "Definition");
 
                     Map<String, Object> item = new HashMap<>();
                     item.put("Items", data);

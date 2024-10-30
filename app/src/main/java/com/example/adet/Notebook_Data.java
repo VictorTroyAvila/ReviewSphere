@@ -2,16 +2,32 @@ package com.example.adet;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.Firebase;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -25,6 +41,9 @@ public class Notebook_Data extends AppCompatActivity {
 
     private TextView sectionTitle;
     private LinearLayout content_Container;
+
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference myRef = database.getReference("Name List");
 
     Intent theintent;
     @Override
@@ -41,91 +60,6 @@ public class Notebook_Data extends AppCompatActivity {
         theintent = getIntent();
         content_Container = findViewById(R.id.content_Container);
         sectionTitle = findViewById(R.id.section_Title);
-        sectionTitle.setText(theintent.getStringExtra("title"));
-        readJson();
-    }
-
-    private void readJson() {
-        try {
-            InputStream inputStream = getAssets().open("sample.json");
-            int size = inputStream.available();
-            byte[] buffer = new byte[size];
-            inputStream.read(buffer);
-            inputStream.close();
-
-            String json;
-
-            json = new String(buffer, StandardCharsets.UTF_8);
-
-            parseJson(json);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    private void parseJson(String jsonString) {
-        try {
-            JSONObject jsonObject = new JSONObject(jsonString);
-            JSONArray contentArray = jsonObject.getJSONArray("Content");
-
-            for (int i = 0; i < contentArray.length(); i++) {
-                JSONObject sectionObject = contentArray.getJSONObject(i);
-                String sectionName = sectionObject.getString("Section");
-
-                if (sectionName.equals(theintent.getStringExtra("title"))) {
-                    JSONArray itemArray = sectionObject.getJSONArray("Item");
-
-                    for (int j = 0; j < itemArray.length(); j++) {
-                        JSONObject itemObject = itemArray.getJSONObject(j);
-                        String term = itemObject.getString("Term");
-                        String definition = itemObject.getString("Definition");
-
-                        TextView termView = new TextView(this);
-                        TextView definitionView = new TextView(this);
-
-                        //Edit term TextView
-                        termView.setText(term);
-                        termView.setId(View.generateViewId());
-                        termView.setTextSize(20);
-                        termView.setTypeface(null, android.graphics.Typeface.BOLD);
-                        termView.setGravity(Gravity.CENTER);
-                        termView.setBackground(getResources().getDrawable(R.drawable.rounding_corner));
-                        termView.setBackgroundColor(getResources().getColor(R.color.faded_purple));
-                        termView.setPadding(32, 32, 32, 32);
-
-                        //Edit definition TextView
-                        definitionView.setText(definition);
-                        definitionView.setId(View.generateViewId());
-                        definitionView.setTextSize(16);
-                        definitionView.setBackground(getResources().getDrawable(R.drawable.rounding_corner));
-                        definitionView.setBackgroundColor(getResources().getColor(R.color.faded_purple));
-                        definitionView.setPadding(30,30,30,30);
-
-                        //Set Term Parameters
-                        LinearLayout.LayoutParams termparams = new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT
-                        );
-                        termparams.setMargins(16, 16, 16, 0);
-                        termView.setLayoutParams(termparams);
-
-                        //Set Definition Parameters
-                        LinearLayout.LayoutParams definitionparams = new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT
-                        );
-                        definitionparams.setMargins(16, 0, 16, 16);
-                        definitionView.setLayoutParams(definitionparams);
-
-                        content_Container.addView(termView);
-                        content_Container.addView(definitionView);
-                    }
-                    break; // Stop searching once the section is found
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        sectionTitle.setText(myRef.child(theintent.getStringExtra("Fname")).child("Notebook").child(theintent.getStringExtra("Subject")).getKey());
     }
 }
