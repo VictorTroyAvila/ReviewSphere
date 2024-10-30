@@ -55,8 +55,9 @@ public class Home extends AppCompatActivity {
         Notebook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String fname = theIntent.getStringExtra("Fname");
                 Intent intent = new Intent(Home.this, Notebook.class);
-                intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
+                intent.putExtra("Fname", fname);
                 startActivity(intent);
             }
         });

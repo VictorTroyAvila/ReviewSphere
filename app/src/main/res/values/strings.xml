@@ -56,6 +56,8 @@
     <string name="subjecttitle">Subject Title</string>
     <string name="newsubjecttitle">New Subject Title</string>
     <string name="topic">Topic</string>
+    <string name="newtopic">New Topic</string>
+    <string name="optional">Optional</string>
 
     <string-array name="gender">
         <item>Male</item>

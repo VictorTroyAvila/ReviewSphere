@@ -161,13 +161,40 @@ public class Notebook extends AppCompatActivity {
                     Map<String, Object> subject = new HashMap<>();
                     subject.put(SubjectTitle, Topic);
 
-                    AddChecking(theIntent.getStringExtra("Fname"), new CheckCallback() {
+                    NotebookChecking(theIntent.getStringExtra("Fname"), new CheckCallback() {
                         @Override
                         public void onCheckComplete(boolean exists) {
-                            // Handle the result here
                             if (exists) {
-                                myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(SubjectTitle).setValue(Topic);
+                                //If Notebook Exists
+                                SubjectChecking(theIntent.getStringExtra("Fname"), SubjectTitle, new CheckCallback() {
+                                    @Override
+                                    public void onCheckComplete(boolean exists) {
+                                        //If Subject Exists
+                                        if (exists) {
+                                            TopicChecking(theIntent.getStringExtra("Fname"), SubjectTitle, TopicTitle, new CheckCallback() {
+                                                @Override
+                                                public void onCheckComplete(boolean exists) {
+                                                    //If subject and topic exists
+                                                    if (exists) {
+                                                        AlertDialog alertDialog = new AlertDialog.Builder(Notebook.this).create();
+                                                        alertDialog.setTitle("Error");
+                                                        alertDialog.setMessage("Topic already exists");
+                                                        alertDialog.show();
+                                                    }
+                                                    else {
+                                                        myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(SubjectTitle).child(TopicTitle).setValue(item);
+                                                    }
+                                                }
+                                            });
+                                        }
+                                        //If Subject does not exist
+                                        else {
+                                            myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(SubjectTitle).child(TopicTitle).setValue(item);
+                                        }
+                                    }
+                                });
                             }
+                            //If Notebook does not exist
                             else
                             {
                                 myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").setValue(subject);
@@ -180,7 +207,7 @@ public class Notebook extends AppCompatActivity {
             });
         });
 
-        //Edit Subject and Content
+        //Edit Subject and or Topic
         Edit.setOnClickListener(v -> {
             // Inflate the custom layout
             LayoutInflater inflater = getLayoutInflater();
@@ -195,6 +222,8 @@ public class Notebook extends AppCompatActivity {
             // Get references to UI elements
             EditText subjectTitle = dialogView.findViewById(R.id.dialog_edit_subject_title);
             EditText newSubjectTitle = dialogView.findViewById(R.id.dialog_edit_new_subject_title);
+            EditText topicTitle = dialogView.findViewById(R.id.dialog_edit_topic_title);
+            EditText newTopicTitle = dialogView.findViewById(R.id.dialog_edit_new_topic_title);
             Button EditButton = dialogView.findViewById(R.id.dialog_edit);
 
             // Show the dialog
@@ -206,24 +235,139 @@ public class Notebook extends AppCompatActivity {
                 public void onClick(View v) {
                     String SubjectTitle = subjectTitle.getText().toString();
                     String NewSubjectTitle = newSubjectTitle.getText().toString();
+                    String TopicTitle = topicTitle.getText().toString();
+                    String NewTopicTitle = newTopicTitle.getText().toString();
 
-                    EditChecking(theIntent.getStringExtra("Fname"), SubjectTitle, new CheckCallback() {
+                    SubjectChecking(theIntent.getStringExtra("Fname"), SubjectTitle, new CheckCallback() {
                         @Override
                         public void onCheckComplete(boolean exists) {
-                         if(exists)
-                         {
-                             myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                                 @Override
-                                 public void onComplete(@NonNull Task<DataSnapshot> task) {
-                                     if(task.isSuccessful())
-                                     {
-                                         Object data = task.getResult().child(SubjectTitle).getValue();
-                                         myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(NewSubjectTitle).setValue(data);
-                                         myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(SubjectTitle).removeValue();
-                                     }
-                                 }
-                             });
-                         }
+                            //If Subject Exists
+                            if (exists) {
+                                //If new subject title is empty
+                                if(NewSubjectTitle.equalsIgnoreCase("")) {
+                                    TopicChecking(theIntent.getStringExtra("Fname"), SubjectTitle, TopicTitle, new CheckCallback() {
+                                        @Override
+                                        public void onCheckComplete(boolean exists) {
+                                            //If Subject and Topic Exists, but no new subject title
+                                            if (exists) {
+                                                if (NewTopicTitle.equalsIgnoreCase("")) {
+                                                    AlertDialog alertDialog = new AlertDialog.Builder(Notebook.this).create();
+                                                    alertDialog.setTitle("Error");
+                                                    alertDialog.setMessage("Nothing to Edit");
+                                                    alertDialog.show();
+                                                }
+                                                //If Subject, topic, and new title Exists
+                                                else {
+                                                    myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(SubjectTitle).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                                            if(task.isSuccessful())
+                                                            {
+                                                                Object data = task.getResult().child(TopicTitle).getValue();
+                                                                myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(SubjectTitle).child(NewTopicTitle).setValue(data);
+                                                                myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(SubjectTitle).child(TopicTitle).removeValue();
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                            //If Topic does not exist
+                                            else {
+                                                AlertDialog alertDialog = new AlertDialog.Builder(Notebook.this).create();
+                                                alertDialog.setTitle("Error");
+                                                alertDialog.setMessage("Nothing to Edit");
+                                                alertDialog.show();
+                                            }
+                                        }
+                                    });
+                                }
+                                //If new subject title is not empty
+                                else {
+                                    TopicChecking(theIntent.getStringExtra("Fname"), SubjectTitle, TopicTitle, new CheckCallback() {
+                                        @Override
+                                        public void onCheckComplete(boolean exists) {
+                                            //If Subject and Topic Exists w/ subject title
+                                            if (exists) {
+                                                //If New Topic title is empty
+                                                if(NewTopicTitle.equalsIgnoreCase("")) {
+                                                    myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                                            if(task.isSuccessful())
+                                                            {
+                                                                Object data = task.getResult().child(SubjectTitle).getValue();
+                                                                myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(NewSubjectTitle).setValue(data);
+                                                                myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(SubjectTitle).removeValue();
+                                                            }
+                                                        }
+                                                    });
+
+                                                    AlertDialog alertDialog = new AlertDialog.Builder(Notebook.this).create();
+                                                    alertDialog.setTitle("Alert");
+                                                    alertDialog.setMessage("Only Subject title changed");
+                                                    alertDialog.show();
+                                                }
+                                                //If Topic title is not empty
+                                                else {
+                                                    myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(SubjectTitle).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                                        if(task.isSuccessful())
+                                                        {
+                                                            Object data = task.getResult().child(SubjectTitle).child(TopicTitle).getValue();
+                                                            myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(SubjectTitle).child(NewTopicTitle).setValue(data);
+                                                            myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(SubjectTitle).child(TopicTitle).removeValue();
+                                                        }
+                                                    }
+                                                });
+                                                    myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                                        if(task.isSuccessful())
+                                                        {
+                                                            Object data = task.getResult().child(SubjectTitle).getValue();
+                                                            myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(NewSubjectTitle).setValue(data);
+                                                            myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(SubjectTitle).removeValue();
+                                                        }
+                                                    }
+                                                });
+                                                }
+                                            }
+                                            //If Subject exists but Topic does not exist
+                                            else{
+                                                //If Topic title is empty
+                                                if (TopicTitle.equalsIgnoreCase("")) {
+                                                    AlertDialog alertDialog = new AlertDialog.Builder(Notebook.this).create();
+                                                    alertDialog.setTitle("Error");
+                                                    alertDialog.setMessage("Topic does not exist");
+                                                    alertDialog.show();
+                                                }
+                                                else {
+                                                    myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                                            //If Subject and new subject title exists w/ no topic title and new topic title
+                                                            if(task.isSuccessful())
+                                                            {
+                                                                Object data = task.getResult().child(SubjectTitle).getValue();
+                                                                myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(NewSubjectTitle).setValue(data);
+                                                                myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(SubjectTitle).removeValue();
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                            //If Subject does not exist
+                            else{
+                                AlertDialog alertDialog = new AlertDialog.Builder(Notebook.this).create();
+                                alertDialog.setTitle("Error");
+                                alertDialog.setMessage("Subject does not exist");
+                                alertDialog.show();
+                            }
                         }
                     });
                     dialog.dismiss();
@@ -232,7 +376,7 @@ public class Notebook extends AppCompatActivity {
 
         });
 
-        //Delete Subject and Content
+        //Delete Subject and or Topic
         Delete.setOnClickListener(v -> {
             // Inflate the custom layout
             LayoutInflater inflater = getLayoutInflater();
@@ -246,6 +390,7 @@ public class Notebook extends AppCompatActivity {
 
             // Get references to UI elements
             EditText subjectTitle = dialogView.findViewById(R.id.dialog_delete_subject_title);
+            EditText topicTitle = dialogView.findViewById(R.id.dialog_delete_topic_title);
             Button DeleteButton = dialogView.findViewById(R.id.dialog_delete);
 
             // Show the dialog
@@ -256,13 +401,30 @@ public class Notebook extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     String SubjectTitle = subjectTitle.getText().toString();
+                    String TopicTitle = topicTitle.getText().toString();
 
-                    DeleteChecking(theIntent.getStringExtra("Fname"), SubjectTitle, new CheckCallback() {
+                    SubjectChecking(theIntent.getStringExtra("Fname"), SubjectTitle, new CheckCallback() {
                         @Override
                         public void onCheckComplete(boolean exists) {
-                            if (exists)
-                            {
-                                myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(SubjectTitle).removeValue();
+                            //If Subject Exists
+                            if (exists) {
+                               myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(SubjectTitle).removeValue();
+                            }
+                            else {
+                                TopicChecking(theIntent.getStringExtra("Fname"), SubjectTitle, TopicTitle, new CheckCallback() {
+                                    @Override
+                                    public void onCheckComplete(boolean exists) {
+                                        if (exists) {
+                                            myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(SubjectTitle).child(TopicTitle).removeValue();
+                                        }
+                                        else {
+                                            AlertDialog alertDialog = new AlertDialog.Builder(Notebook.this).create();
+                                            alertDialog.setTitle("Error");
+                                            alertDialog.setMessage("Nothing to Delete");
+                                            alertDialog.show();
+                                        }
+                                    }
+                                });
                             }
                         }
                     });
@@ -272,17 +434,31 @@ public class Notebook extends AppCompatActivity {
         });
     }
 
-    private void AddChecking(String Acc, CheckCallback callback) {
-        myRef.child(Acc).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+    private void NotebookChecking(String Acc, CheckCallback callback) {
+        myRef.child(Acc).child("Notebook").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (task.isSuccessful()) {
+                    boolean exist = task.getResult().exists();
+                    callback.onCheckComplete(exist);
+                } else {
+                    callback.onCheckComplete(false); // Handle error
+                }
+            }
+        });
+    }
+
+    private void SubjectChecking(String Acc, String Subject, CheckCallback callback) {
+        myRef.child(Acc).child("Notebook").child(Subject).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if (task.isSuccessful()) {
                     boolean exist = false;
-                    for (DataSnapshot childSnapshot : task.getResult().getChildren()) {
-                        if (childSnapshot.child("Notebook").exists())
-                        {
-                            exist = true;
-                        }
+                    if (myRef.child(Acc).child("Notebook").child(Subject).getKey().equalsIgnoreCase(Subject)){
+                        exist = true;
+                    }
+                    else {
+                        exist = false;
                     }
                     callback.onCheckComplete(exist);
                 } else {
@@ -292,37 +468,17 @@ public class Notebook extends AppCompatActivity {
         });
     }
 
-    private void EditChecking(String Acc, String Subject, CheckCallback callback) {
-        myRef.child(Acc).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+    private void TopicChecking(String Acc, String Subject, String Topic, CheckCallback callback) {
+        myRef.child(Acc).child("Notebook").child(Subject).child(Topic).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if (task.isSuccessful()) {
                     boolean exist = false;
-                    for (DataSnapshot childSnapshot : task.getResult().getChildren()) {
-                        if (childSnapshot.child(Subject).exists())
-                        {
-                            exist = true;
-                        }
+                    if (myRef.child(Acc).child("Notebook").child(Subject).child(Topic).getKey().equalsIgnoreCase(Topic)){
+                        exist = true;
                     }
-                    callback.onCheckComplete(exist);
-                } else {
-                    callback.onCheckComplete(false); // Handle error
-                }
-            }
-        });
-    }
-
-    private void DeleteChecking(String Acc, String Subject, CheckCallback callback) {
-        myRef.child(Acc).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DataSnapshot> task) {
-                if (task.isSuccessful()) {
-                    boolean exist = false;
-                    for (DataSnapshot childSnapshot : task.getResult().getChildren()) {
-                        if (childSnapshot.child(Subject).exists())
-                        {
-                            exist = true;
-                        }
+                    else {
+                        exist = false;
                     }
                     callback.onCheckComplete(exist);
                 } else {
