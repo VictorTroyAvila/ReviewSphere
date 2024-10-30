@@ -98,11 +98,11 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
                     }
-                    callback.onCheckComplete(exist);
-                } else {
-                    callback.onCheckComplete(false);
+                        callback.onCheckComplete(exist);
+                    } else {
+                        callback.onCheckComplete(false);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
-}
