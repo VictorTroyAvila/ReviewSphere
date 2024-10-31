@@ -60,7 +60,9 @@ public class Notebook extends AppCompatActivity {
         Delete = findViewById(R.id.notebookDelete);
 
         //Display all data
-        myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").addValueEventListener(new ValueEventListener() {
+        myRef.child(theIntent.getStringExtra("Fname"))
+                .child("Notebook")
+                .addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 content_Container.removeAllViews();

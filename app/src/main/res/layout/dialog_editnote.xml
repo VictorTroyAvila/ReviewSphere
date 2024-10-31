@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/faded_purple">
+    android:background="@drawable/rounding_corner_lite"
+    android:backgroundTint="@color/faded_purple">
 
     <TextView
         android:id="@+id/textView11"

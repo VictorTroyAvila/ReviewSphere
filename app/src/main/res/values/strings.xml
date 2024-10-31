@@ -58,6 +58,8 @@
     <string name="topic">Topic</string>
     <string name="newtopic">New Topic</string>
     <string name="optional">Optional</string>
+    <string name="term">Term</string>
+    <string name="definition">Definition</string>
 
     <string-array name="gender">
         <item>Male</item>
