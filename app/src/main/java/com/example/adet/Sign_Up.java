@@ -19,9 +19,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class Sign_Up extends AppCompatActivity {
 
     TextView Email, Password, FullName, tologin;
@@ -51,7 +48,7 @@ public class Sign_Up extends AppCompatActivity {
             String PasswordText = Password.getText().toString();
             String FullNameText = FullName.getText().toString();
 
-            Checking(FullNameText, EmailText, PasswordText, new CheckCallback() {
+            Checking(FullNameText, EmailText, PasswordText, new BooleanCallback() {
                 @Override
                 public void onCheckComplete(boolean exists) {
                     // Handle the result here
@@ -80,7 +77,7 @@ public class Sign_Up extends AppCompatActivity {
         });
     }
 
-    private void Checking(String NameText, String EmailText, String PasswordText, CheckCallback callback) {
+    private void Checking(String NameText, String EmailText, String PasswordText, BooleanCallback booleanCallback) {
         myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
@@ -92,9 +89,9 @@ public class Sign_Up extends AppCompatActivity {
                             exist = true;
                         }
                     }
-                    callback.onCheckComplete(exist);
+                    booleanCallback.onCheckComplete(exist);
                 } else {
-                    callback.onCheckComplete(false); // Handle error
+                    booleanCallback.onCheckComplete(false); // Handle error
                 }
             }
         });

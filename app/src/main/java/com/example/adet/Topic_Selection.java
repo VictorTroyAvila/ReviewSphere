@@ -9,10 +9,17 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,7 +34,11 @@ public class Topic_Selection extends AppCompatActivity {
     private LinearLayout content_container;
     private ImageView sidemenu;
 
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference myRef = database.getReference("Name List");
+
     Intent theIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,124 +53,97 @@ public class Topic_Selection extends AppCompatActivity {
         theIntent = getIntent();
         sidemenu = findViewById(R.id.sidemenu);
         content_container = findViewById(R.id.content_container);
-        JSONArray section = readJsonSection();
 
-        try {
-            for (int i = 0; i < section.length(); i++) {
-                Object element = section.get(i);
-                if (element instanceof String) {
-                    String stringValue = (String) element;
+        myRef.child(theIntent.getStringExtra("Fname"))
+                .child("Notebook")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        content_container.removeAllViews();
+                        //Subject
+                        for (DataSnapshot subjectSnapshot : snapshot.getChildren()) {
+                            //Topic
+                            for (DataSnapshot topicSnapshot : subjectSnapshot.getChildren()) {
+                                String Subject = subjectSnapshot.getKey();
+                                String Topic = topicSnapshot.getKey();
 
-                    TextView textView = new TextView(this);
-                    textView.setText(stringValue);
-                    textView.setId(View.generateViewId());
-                    textView.setTextSize(16);
-                    textView.setBackground(getResources().getDrawable(R.drawable.rounding_corner));
-                    textView.setBackgroundColor(getResources().getColor(R.color.faded_purple));
-                    textView.setPadding(32, 32, 32, 32);
+                                TextView textView = new TextView(Topic_Selection.this);
+                                textView.setText(Subject +
+                                        "\nTopic: " + Topic);
+                                textView.setId(View.generateViewId());
+                                textView.setTextSize(16);
+                                textView.setBackground(getResources().getDrawable(R.drawable.rounding_corner));
+                                textView.setBackgroundColor(getResources().getColor(R.color.faded_purple));
+                                textView.setPadding(32, 32, 32, 32);
 
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                    );
-                    params.setMargins(16, 16, 16, 16);
-                    textView.setLayoutParams(params);
+                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                        LinearLayout.LayoutParams.MATCH_PARENT,
+                                        LinearLayout.LayoutParams.WRAP_CONTENT
+                                );
+                                params.setMargins(16, 16, 16, 16);
+                                textView.setLayoutParams(params);
 
-                    content_container.addView(textView);
+                                content_container.addView(textView);
 
-                    textView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            String val = theIntent.getStringExtra("title");
-                            switch (val) {
-                                case "Quizzes":
-                                    Intent intent1 = new Intent(Topic_Selection.this, Quiz.class);
-                                    intent1.putExtra("title", stringValue);
-                                    startActivity(intent1);
-                                    break;
-                                case "Flashcards":
-                                    Intent intent2 = new Intent(Topic_Selection.this, Flashcards.class);
-                                    intent2.putExtra("title", stringValue);
-                                    startActivity(intent2);
-                                    break;
-                                case "Strips":
-                                    Intent intent4 = new Intent(Topic_Selection.this, Strips.class);
-                                    intent4.putExtra("title", stringValue);
-                                    startActivity(intent4);
-                                    break;
-                                case "ToF":
-                                    Intent intent5 = new Intent(Topic_Selection.this, TrueOrFalse.class);
-                                    intent5.putExtra("title", stringValue);
-                                    startActivity(intent5);
-                                    break;
-                                case "Matching":
-                                    Intent intent6 = new Intent(Topic_Selection.this, Matching_Type.class);
-                                    intent6.putExtra("title", stringValue);
-                                    startActivity(intent6);
-                                    break;
-                                default:
-                                    break;
+                                textView.setOnClickListener(v -> {
+                                    String val = theIntent.getStringExtra("title");
+                                    switch (val) {
+                                        case "Quizzes":
+                                            Intent intent1 = new Intent(Topic_Selection.this, Quiz.class);
+                                            intent1.putExtra("Fname", theIntent.getStringExtra("Fname"));
+                                            intent1.putExtra("Subject", Subject);
+                                            intent1.putExtra("Topic", Topic);
+                                            startActivity(intent1);
+                                            break;
+                                        case "Flashcards":
+                                            Intent intent2 = new Intent(Topic_Selection.this, Flashcards.class);
+                                            intent2.putExtra("Fname", theIntent.getStringExtra("Fname"));
+                                            intent2.putExtra("Subject", Subject);
+                                            intent2.putExtra("Topic", Topic);
+                                            startActivity(intent2);
+                                            break;
+                                        case "Strips":
+                                            Intent intent3 = new Intent(Topic_Selection.this, Strips.class);
+                                            intent3.putExtra("Fname", theIntent.getStringExtra("Fname"));
+                                            intent3.putExtra("Subject", Subject);
+                                            intent3.putExtra("Topic", Topic);
+                                            startActivity(intent3);
+                                            break;
+                                        case "ToF":
+                                            Intent intent4 = new Intent(Topic_Selection.this, TrueOrFalse.class);
+                                            intent4.putExtra("Fname", theIntent.getStringExtra("Fname"));
+                                            intent4.putExtra("Subject", Subject);
+                                            intent4.putExtra("Topic", Topic);
+                                            startActivity(intent4);
+                                            break;
+                                        case "Matching":
+                                            Intent intent5 = new Intent(Topic_Selection.this, Matching_Type.class);
+                                            intent5.putExtra("Fname", theIntent.getStringExtra("Fname"));
+                                            intent5.putExtra("Subject", Subject);
+                                            intent5.putExtra("Topic", Topic);
+                                            startActivity(intent5);
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                });
                             }
                         }
-                    });
-                }
-            }
-        } catch (Exception e) {
+                    }
 
-        }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
 
         sidemenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Topic_Selection.this, Side_Menu.class);
+                intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
                 startActivity(intent);
             }
         });
-    }
-    private JSONArray readJsonSection() {
-        try {
-            InputStream inputStream = getAssets().open("sample.json");
-            int size = inputStream.available();
-            byte[] buffer = new byte[size];
-            inputStream.read(buffer);
-            inputStream.close();
-
-            String json;
-
-            json = new String(buffer, StandardCharsets.UTF_8);
-
-            return parseJsonSection(json);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    private JSONArray parseJsonSection(String jsonString) {
-        try {
-            JSONObject jsonObject = new JSONObject(jsonString);
-            JSONArray allSections = new JSONArray();
-
-            // Extract the "Title"
-            String title = jsonObject.getString("Title");
-
-
-            // Get the "Content" array
-            JSONArray contentArray = jsonObject.getJSONArray("Content");
-
-            // Iterate through the "Content" array
-            for (int i = 0; i < contentArray.length(); i++) {
-                JSONObject contentObject = contentArray.getJSONObject(i);
-
-                // Extract the "Section"
-                allSections.put(contentObject.getString("Section"));
-
-            }
-            return allSections;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 }

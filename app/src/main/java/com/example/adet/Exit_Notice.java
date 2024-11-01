@@ -17,6 +17,8 @@ public class Exit_Notice extends AppCompatActivity {
     private TextView confirm, cancel;
     private ImageView sidemenu;
 
+    Intent theIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +30,7 @@ public class Exit_Notice extends AppCompatActivity {
             return insets;
         });
 
+        theIntent = getIntent();
         confirm = findViewById(R.id.confrim);
         cancel = findViewById(R.id.cancel);
         sidemenu = findViewById(R.id.sidemenu);
@@ -36,6 +39,7 @@ public class Exit_Notice extends AppCompatActivity {
              @Override
              public void onClick(View v) {
                Intent intent = new Intent(Exit_Notice.this, Side_Menu.class);
+               intent.putExtra("title", theIntent.getStringExtra("Fname"));
                startActivity(intent);
              }
         });
@@ -45,6 +49,7 @@ public class Exit_Notice extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Exit_Notice.this, Home.class);
+                intent.putExtra("title", theIntent.getStringExtra("Fname"));
                 startActivity(intent);
                 finish();
             }

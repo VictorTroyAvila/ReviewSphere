@@ -37,6 +37,7 @@ public class Home extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Home.this, Side_Menu.class);
+                intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
                 startActivity(intent);
             }
         });
@@ -47,6 +48,7 @@ public class Home extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(Home.this, Topic_Selection.class);
                 intent.putExtra("title", "Flashcards");
+                intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
                 startActivity(intent);
             }
         });
@@ -55,9 +57,8 @@ public class Home extends AppCompatActivity {
         Notebook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String fname = theIntent.getStringExtra("Fname");
                 Intent intent = new Intent(Home.this, Notebook.class);
-                intent.putExtra("Fname", fname);
+                intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
                 startActivity(intent);
             }
         });
@@ -68,6 +69,7 @@ public class Home extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(Home.this, Topic_Selection.class);
                 intent.putExtra("title", "Quizzes");
+                intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
                 startActivity(intent);
             }
         });

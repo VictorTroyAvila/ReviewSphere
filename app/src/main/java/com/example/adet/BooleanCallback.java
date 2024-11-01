@@ -1,5 +1,5 @@
 package com.example.adet;
 
-public interface CheckCallback {
+public interface BooleanCallback {
     void onCheckComplete(boolean exists);
 }

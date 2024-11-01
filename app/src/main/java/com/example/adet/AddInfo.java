@@ -1,10 +1,7 @@
 package com.example.adet;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
@@ -104,7 +101,7 @@ public class AddInfo extends AppCompatActivity {
             userCreds.put("Password", PasswordText);
             userCreds.put("User Info", userInfo);
 
-            Checking(FullNameText, EmailText, PasswordText, new CheckCallback() {
+            Checking(FullNameText, EmailText, PasswordText, new BooleanCallback() {
                 @Override
                 public void onCheckComplete(boolean exists) {
                     // Handle the result here
@@ -126,7 +123,7 @@ public class AddInfo extends AppCompatActivity {
         });
     }
 
-    private void Checking(String NameText, String EmailText, String PasswordText, CheckCallback callback) {
+    private void Checking(String NameText, String EmailText, String PasswordText, BooleanCallback booleanCallback) {
         myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
@@ -138,9 +135,9 @@ public class AddInfo extends AppCompatActivity {
                             exist = true;
                         }
                     }
-                    callback.onCheckComplete(exist);
+                    booleanCallback.onCheckComplete(exist);
                 } else {
-                    callback.onCheckComplete(false); // Handle error
+                    booleanCallback.onCheckComplete(false); // Handle error
                 }
             }
         });

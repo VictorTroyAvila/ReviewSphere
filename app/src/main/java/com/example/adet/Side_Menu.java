@@ -16,6 +16,9 @@ public class Side_Menu extends AppCompatActivity {
 
     private TextView click_home, click_notebook, click_quizzes, click_flashcards, click_wheel, click_strips, click_ToF, click_matching;
     private ImageView sidemenu_return;
+
+    Intent theIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,6 +30,7 @@ public class Side_Menu extends AppCompatActivity {
             return insets;
         });
 
+        theIntent = getIntent();
         Intent intent = new Intent(Side_Menu.this, Topic_Selection.class);
 
         click_home = findViewById(R.id.sidemenu_home);
@@ -34,6 +38,7 @@ public class Side_Menu extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent homeIntent = new Intent(Side_Menu.this, Home.class);
+                homeIntent.putExtra("Fname", theIntent.getStringExtra("Fname"));
                 startActivity(homeIntent);
                 finish();
             }
@@ -44,6 +49,7 @@ public class Side_Menu extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent notebookIntent = new Intent(Side_Menu.this, Notebook.class);
+                notebookIntent.putExtra("Fname", theIntent.getStringExtra("Fname"));
                 startActivity(notebookIntent);
                 finish();
             }
@@ -54,6 +60,7 @@ public class Side_Menu extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 intent.putExtra("title", "Quizzes");
+                intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
                 startActivity(intent);
                 finish();
             }
@@ -64,6 +71,7 @@ public class Side_Menu extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 intent.putExtra("title", "Flashcards");
+                intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
                 startActivity(intent);
                 finish();
             }
@@ -74,6 +82,7 @@ public class Side_Menu extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 intent.putExtra("title", "Strips");
+                intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
                 startActivity(intent);
                 finish();
             }
@@ -84,6 +93,7 @@ public class Side_Menu extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 intent.putExtra("title", "ToF");
+                intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
                 startActivity(intent);
                 finish();
             }
@@ -94,6 +104,7 @@ public class Side_Menu extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 intent.putExtra("title", "Matching");
+                intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
                 startActivity(intent);
                 finish();
             }

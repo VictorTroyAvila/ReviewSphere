@@ -126,6 +126,7 @@ public class Flashcards extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Flashcards.this, Exit_Notice.class);
+                intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
                 startActivity(intent);
                 finish();
             }
@@ -135,6 +136,7 @@ public class Flashcards extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Flashcards.this, Side_Menu.class);
+                intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
                 startActivity(intent);
                 }
         });

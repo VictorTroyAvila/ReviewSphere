@@ -29,8 +29,6 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.security.auth.Subject;
-
 public class Notebook extends AppCompatActivity {
 
     private LinearLayout content_Container;
@@ -63,55 +61,55 @@ public class Notebook extends AppCompatActivity {
         myRef.child(theIntent.getStringExtra("Fname"))
                 .child("Notebook")
                 .addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                content_Container.removeAllViews();
-                //Subject
-                for (DataSnapshot subjectSnapshot : snapshot.getChildren()) {
-                    //Topic
-                    for (DataSnapshot topicSnapshot : subjectSnapshot.getChildren()) {
-                        //Items
-                        for (DataSnapshot itemsnapshot : topicSnapshot.getChildren()) {
-                            String Subject = subjectSnapshot.getKey();
-                            String Topic = topicSnapshot.getKey();
-                            long itemCount = itemsnapshot.getChildrenCount();
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        content_Container.removeAllViews();
+                        //Subject
+                        for (DataSnapshot subjectSnapshot : snapshot.getChildren()) {
+                            //Topic
+                            for (DataSnapshot topicSnapshot : subjectSnapshot.getChildren()) {
+                                //Items
+                                for (DataSnapshot itemsnapshot : topicSnapshot.getChildren()) {
+                                    String Subject = subjectSnapshot.getKey();
+                                    String Topic = topicSnapshot.getKey();
+                                    long itemCount = itemsnapshot.getChildrenCount();
 
-                            TextView textView = new TextView(Notebook.this);
-                            textView.setText("Topic: " + Topic +
-                                    "\n" + "Items: " + itemCount +
-                                    "\n" + "Subject: " + Subject);
+                                    TextView textView = new TextView(Notebook.this);
+                                    textView.setText("Topic: " + Topic +
+                                            "\n" + "Items: " + itemCount +
+                                            "\n" + "Subject: " + Subject);
 
-                            textView.setBackgroundColor(getResources().getColor(R.color.faded_purple));
-                            textView.setPadding(30, 30, 30, 30);
-                            textView.setTextSize(20);
+                                    textView.setBackgroundColor(getResources().getColor(R.color.faded_purple));
+                                    textView.setPadding(30, 30, 30, 30);
+                                    textView.setTextSize(20);
 
-                            LinearLayout.LayoutParams txtVParams = new LinearLayout.LayoutParams(
-                                    LinearLayout.LayoutParams.MATCH_PARENT,
-                                    LinearLayout.LayoutParams.WRAP_CONTENT
-                            );
-                            txtVParams.setMargins(16, 20, 16, 20);
-                            textView.setLayoutParams(txtVParams);
+                                    LinearLayout.LayoutParams txtVParams = new LinearLayout.LayoutParams(
+                                            LinearLayout.LayoutParams.MATCH_PARENT,
+                                            LinearLayout.LayoutParams.WRAP_CONTENT
+                                    );
+                                    txtVParams.setMargins(16, 20, 16, 20);
+                                    textView.setLayoutParams(txtVParams);
 
-                            textView.setOnClickListener(v -> {
-                                Intent intent = new Intent(Notebook.this, Notebook_Data.class);
-                                intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
-                                intent.putExtra("Subject", Subject);
-                                intent.putExtra("Topic", Topic);
-                                startActivity(intent);
-                            });
+                                    textView.setOnClickListener(v -> {
+                                        Intent intent = new Intent(Notebook.this, Notebook_Data.class);
+                                        intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
+                                        intent.putExtra("Subject", Subject);
+                                        intent.putExtra("Topic", Topic);
+                                        startActivity(intent);
+                                    });
 
-                            content_Container.addView(textView);
+                                    content_Container.addView(textView);
 
+                                }
+                            }
                         }
                     }
-                }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
 
-            }
-        });
+                    }
+                });
 
         //Go to Side menu
         goto_sidemenu.setOnClickListener(new View.OnClickListener() {
@@ -163,17 +161,17 @@ public class Notebook extends AppCompatActivity {
                     Map<String, Object> subject = new HashMap<>();
                     subject.put(SubjectTitle, Topic);
 
-                    NotebookChecking(theIntent.getStringExtra("Fname"), new CheckCallback() {
+                    NotebookChecking(theIntent.getStringExtra("Fname"), new BooleanCallback() {
                         @Override
                         public void onCheckComplete(boolean exists) {
                             if (exists) {
                                 //If Notebook Exists
-                                SubjectChecking(theIntent.getStringExtra("Fname"), SubjectTitle, new CheckCallback() {
+                                SubjectChecking(theIntent.getStringExtra("Fname"), SubjectTitle, new BooleanCallback() {
                                     @Override
                                     public void onCheckComplete(boolean exists) {
                                         //If Subject Exists
                                         if (exists) {
-                                            TopicChecking(theIntent.getStringExtra("Fname"), SubjectTitle, TopicTitle, new CheckCallback() {
+                                            TopicChecking(theIntent.getStringExtra("Fname"), SubjectTitle, TopicTitle, new BooleanCallback() {
                                                 @Override
                                                 public void onCheckComplete(boolean exists) {
                                                     //If subject and topic exists
@@ -240,14 +238,14 @@ public class Notebook extends AppCompatActivity {
                     String TopicTitle = topicTitle.getText().toString();
                     String NewTopicTitle = newTopicTitle.getText().toString();
 
-                    SubjectChecking(theIntent.getStringExtra("Fname"), SubjectTitle, new CheckCallback() {
+                    SubjectChecking(theIntent.getStringExtra("Fname"), SubjectTitle, new BooleanCallback() {
                         @Override
                         public void onCheckComplete(boolean exists) {
                             //If Subject Exists
                             if (exists) {
                                 //If new subject title is empty
                                 if(NewSubjectTitle.equalsIgnoreCase("")) {
-                                    TopicChecking(theIntent.getStringExtra("Fname"), SubjectTitle, TopicTitle, new CheckCallback() {
+                                    TopicChecking(theIntent.getStringExtra("Fname"), SubjectTitle, TopicTitle, new BooleanCallback() {
                                         @Override
                                         public void onCheckComplete(boolean exists) {
                                             //If Subject and Topic Exists, but no new subject title
@@ -285,7 +283,7 @@ public class Notebook extends AppCompatActivity {
                                 }
                                 //If new subject title is not empty
                                 else {
-                                    TopicChecking(theIntent.getStringExtra("Fname"), SubjectTitle, TopicTitle, new CheckCallback() {
+                                    TopicChecking(theIntent.getStringExtra("Fname"), SubjectTitle, TopicTitle, new BooleanCallback() {
                                         @Override
                                         public void onCheckComplete(boolean exists) {
                                             //If Subject and Topic Exists w/ subject title
@@ -405,7 +403,7 @@ public class Notebook extends AppCompatActivity {
                     String SubjectTitle = subjectTitle.getText().toString();
                     String TopicTitle = topicTitle.getText().toString();
 
-                    SubjectChecking(theIntent.getStringExtra("Fname"), SubjectTitle, new CheckCallback() {
+                    SubjectChecking(theIntent.getStringExtra("Fname"), SubjectTitle, new BooleanCallback() {
                         @Override
                         public void onCheckComplete(boolean exists) {
                             //If Subject Exists
@@ -413,7 +411,7 @@ public class Notebook extends AppCompatActivity {
                                myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(SubjectTitle).removeValue();
                             }
                             else {
-                                TopicChecking(theIntent.getStringExtra("Fname"), SubjectTitle, TopicTitle, new CheckCallback() {
+                                TopicChecking(theIntent.getStringExtra("Fname"), SubjectTitle, TopicTitle, new BooleanCallback() {
                                     @Override
                                     public void onCheckComplete(boolean exists) {
                                         if (exists) {
@@ -436,21 +434,21 @@ public class Notebook extends AppCompatActivity {
         });
     }
 
-    private void NotebookChecking(String Acc, CheckCallback callback) {
+    private void NotebookChecking(String Acc, BooleanCallback booleanCallback) {
         myRef.child(Acc).child("Notebook").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if (task.isSuccessful()) {
                     boolean exist = task.getResult().exists();
-                    callback.onCheckComplete(exist);
+                    booleanCallback.onCheckComplete(exist);
                 } else {
-                    callback.onCheckComplete(false); // Handle error
+                    booleanCallback.onCheckComplete(false); // Handle error
                 }
             }
         });
     }
 
-    private void SubjectChecking(String Acc, String Subject, CheckCallback callback) {
+    private void SubjectChecking(String Acc, String Subject, BooleanCallback booleanCallback) {
         myRef.child(Acc).child("Notebook").child(Subject).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
@@ -462,15 +460,15 @@ public class Notebook extends AppCompatActivity {
                     else {
                         exist = false;
                     }
-                    callback.onCheckComplete(exist);
+                    booleanCallback.onCheckComplete(exist);
                 } else {
-                    callback.onCheckComplete(false); // Handle error
+                    booleanCallback.onCheckComplete(false); // Handle error
                 }
             }
         });
     }
 
-    private void TopicChecking(String Acc, String Subject, String Topic, CheckCallback callback) {
+    private void TopicChecking(String Acc, String Subject, String Topic, BooleanCallback booleanCallback) {
         myRef.child(Acc).child("Notebook").child(Subject).child(Topic).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
@@ -482,9 +480,9 @@ public class Notebook extends AppCompatActivity {
                     else {
                         exist = false;
                     }
-                    callback.onCheckComplete(exist);
+                    booleanCallback.onCheckComplete(exist);
                 } else {
-                    callback.onCheckComplete(false); // Handle error
+                    booleanCallback.onCheckComplete(false); // Handle error
                 }
             }
         });

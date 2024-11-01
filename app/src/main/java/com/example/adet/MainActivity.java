@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
                 String EmailText = Email.getText().toString();
                 String PasswordText = Password.getText().toString();
 
-                Checking(NameText, EmailText, PasswordText, new CheckCallback() {
+                Checking(NameText, EmailText, PasswordText, new BooleanCallback() {
                     @Override
                     public void onCheckComplete(boolean exists) {
                         // Handle the result here
@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void Checking(String NameText, String EmailText, String PasswordText, CheckCallback callback) {
+    private void Checking(String NameText, String EmailText, String PasswordText, BooleanCallback booleanCallback) {
         myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
@@ -98,9 +98,9 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
                     }
-                        callback.onCheckComplete(exist);
+                        booleanCallback.onCheckComplete(exist);
                     } else {
-                        callback.onCheckComplete(false);
+                        booleanCallback.onCheckComplete(false);
                     }
                 }
             });
