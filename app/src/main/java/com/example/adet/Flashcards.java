@@ -9,11 +9,20 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -24,6 +33,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 public class Flashcards extends AppCompatActivity {
 
@@ -37,6 +47,9 @@ public class Flashcards extends AppCompatActivity {
 
     Random random = new Random();
     Intent theIntent;
+
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference myRef = database.getReference("Name List");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,9 +74,108 @@ public class Flashcards extends AppCompatActivity {
         ekis = findViewById(R.id.Eks);
         sidemenu = findViewById(R.id.sidemenu);
 
-        final int[] rndIndex = {readJsonRandomIndex()};
+        myRef.child(theIntent.getStringExtra("Fname"))
+                .child("Notebook")
+                .child(theIntent.getStringExtra("Subject"))
+                .child(theIntent.getStringExtra("Topic"))
+                .child("Items")
+                .get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        int index = (int) task.getResult().getChildrenCount();
+                        ArrayList <String> termList = new ArrayList<>();
+                        ArrayList <String> definitionList = new ArrayList<>();
+                        for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                            termList.add(snapshot.getKey());
+                            definitionList.add(snapshot.getValue().toString());
+                        }
 
-        QuestionToAnswer.setText(""+readJsonRandomDefinition(rndIndex[0]));
+                        ReturnValues(termList, definitionList, index);
+                    }
+                });
+
+        showAnswer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                String compare = QuestionToAnswer.getText().toString();
+//                invisConstrain.setVisibility(View.VISIBLE);
+//
+//                invisTextView.setText(QuestionToAnswer.getText().toString());
+//                QuestionToAnswer.setText(readJsonRandomTerm(rndIndex[0]));
+//
+//                if(readJsonEqualTerm(compare, rndIndex[0])){
+//                    wrong.setAlpha(1f);
+//                    correct.setAlpha(1f);
+//                    showAnswer.setAlpha(0.5f);
+//                    showAnswer.setEnabled(false);
+//                    wrong.setEnabled(true);
+//                    correct.setEnabled(true);
+//                }
+//                else {
+//                    System.out.println("Paano nag kamali toh");
+//                }
+            }
+        });
+
+        wrong.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                counterW++;
+//                wCounter.setText(String.valueOf(counterW));
+//                rndIndex[0] = readJsonRandomIndex();
+//                QuestionToAnswer.setText(readJsonRandomDefinition(rndIndex[0]));
+//                invisConstrain.setVisibility(View.INVISIBLE);
+//                showAnswer.setAlpha(1f);
+//                wrong.setAlpha(0.5f);
+//                correct.setAlpha(0.5f);
+//                showAnswer.setEnabled(true);
+//                wrong.setEnabled(false);
+//                correct.setEnabled(false);
+            }
+        });
+
+        correct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                counterC++;
+//                cCounter.setText(String.valueOf(counterC));
+//                rndIndex[0] = readJsonRandomIndex();
+//                QuestionToAnswer.setText(readJsonRandomDefinition(rndIndex[0]));
+//                invisConstrain.setVisibility(View.INVISIBLE);
+//                showAnswer.setAlpha(1f);
+//                wrong.setAlpha(0.5f);
+//                correct.setAlpha(0.5f);
+//                showAnswer.setEnabled(true);
+//                wrong.setEnabled(false);
+//                correct.setEnabled(false);
+            }
+        });
+
+        ekis.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Flashcards.this, Exit_Notice.class);
+                intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        sidemenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Flashcards.this, Side_Menu.class);
+                intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
+                startActivity(intent);
+                }
+        });
+
+    }
+
+    private void ReturnValues(ArrayList <String> termList, ArrayList <String> definitionList, int index) {
+        int[] rndIndex = new int[1];
+        rndIndex[0] = randomizingIndex(index);
+
+        QuestionToAnswer.setText(definitionList.get(rndIndex[0]));
 
         showAnswer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,9 +184,9 @@ public class Flashcards extends AppCompatActivity {
                 invisConstrain.setVisibility(View.VISIBLE);
 
                 invisTextView.setText(QuestionToAnswer.getText().toString());
-                QuestionToAnswer.setText(readJsonRandomTerm(rndIndex[0]));
+                QuestionToAnswer.setText(termList.get(rndIndex[0]));
 
-                if(readJsonEqualTerm(compare, rndIndex[0])){
+                if(checkEqual(compare, definitionList, rndIndex[0])){
                     wrong.setAlpha(1f);
                     correct.setAlpha(1f);
                     showAnswer.setAlpha(0.5f);
@@ -121,27 +233,22 @@ public class Flashcards extends AppCompatActivity {
                 correct.setEnabled(false);
             }
         });
-
-        ekis.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Flashcards.this, Exit_Notice.class);
-                intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
-                startActivity(intent);
-                finish();
-            }
-        });
-
-        sidemenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Flashcards.this, Side_Menu.class);
-                intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
-                startActivity(intent);
-                }
-        });
-
     }
+
+    private int randomizingIndex(int index) {
+        Random random = new Random();
+        return random.nextInt(index);
+    }
+
+    private boolean checkEqual(String ans, ArrayList <String> definitionList, int index) {
+        if (ans.equalsIgnoreCase(definitionList.get(index))) {
+            return true;
+        } else {
+            System.out.println("Paano nag kamali toh");
+        }
+        return false;
+    }
+
     private String readJsonRandomDefinition(int index) {
         try {
             InputStream inputStream = getAssets().open("sample.json");
@@ -196,6 +303,7 @@ public class Flashcards extends AppCompatActivity {
             return "Error processing JSON.";
         }
     }
+
     private String readJsonRandomTerm(int index) {
         try {
             InputStream inputStream = getAssets().open("sample.json");
@@ -249,6 +357,7 @@ public class Flashcards extends AppCompatActivity {
             return "Error processing JSON.";
         }
     }
+
     private int readJsonRandomIndex() {
         try {
             InputStream inputStream = getAssets().open("sample.json");
@@ -304,6 +413,7 @@ public class Flashcards extends AppCompatActivity {
             return -1; // Error processing JSON
         }
     }
+
     private boolean readJsonEqualTerm(String ans, int index) {
         try {
             InputStream inputStream = getAssets().open("sample.json");
