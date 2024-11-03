@@ -116,6 +116,7 @@ public class Notebook extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Notebook.this, Side_Menu.class);
+                intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
                 startActivity(intent);
             }
         });

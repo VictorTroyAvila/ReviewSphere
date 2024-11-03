@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -28,6 +29,7 @@ public class Notebook_Data extends AppCompatActivity {
     private TextView sectionTitle;
     private LinearLayout content_Container;
     private Button Add;
+    private ImageView sidemenu;
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("Name List");
@@ -45,6 +47,7 @@ public class Notebook_Data extends AppCompatActivity {
         });
 
         theIntent = getIntent();
+        sidemenu = findViewById(R.id.sidemenu);
         content_Container = findViewById(R.id.content_Container);
         sectionTitle = findViewById(R.id.section_Title);
         Add = findViewById(R.id.notebookDataAdd);
@@ -127,6 +130,15 @@ public class Notebook_Data extends AppCompatActivity {
                         // Handle error
                     }
                 });
+
+        sidemenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Notebook_Data.this, Side_Menu.class);
+                intent.putExtra("Fname",theIntent.getStringExtra("Fname"));
+                startActivity(intent);
+            }
+        });
 
         Add.setOnClickListener(new View.OnClickListener() {
             @Override

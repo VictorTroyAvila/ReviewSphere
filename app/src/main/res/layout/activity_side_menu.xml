@@ -10,7 +10,7 @@
 
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="391dp"
+        android:layout_width="0dp"
         android:layout_height="38dp"
         android:background="@color/pink"
         android:backgroundTint="@color/pink"
@@ -24,31 +24,15 @@
         <ImageView
             android:id="@+id/sidemenu"
             android:layout_width="wrap_content"
-            android:layout_height="35dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:padding="1sp"
             app:srcCompat="@drawable/baseline_menu_24" />
 
         <Space
-            android:layout_width="230dp"
+            android:layout_width="320dp"
             android:layout_height="38dp"
             android:layout_weight="1" />
-
-        <ImageView
-            android:id="@+id/imageView6"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_weight="1"
-            android:padding="1sp"
-            app:srcCompat="@drawable/outline_notifications_24" />
-
-        <ImageView
-            android:id="@+id/imageView3"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_weight="1"
-            android:padding="1sp"
-            app:srcCompat="@drawable/outline_settings_24" />
 
     </LinearLayout>
 
