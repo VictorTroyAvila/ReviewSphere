@@ -17,6 +17,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,6 +45,9 @@ public class Matching_Type extends AppCompatActivity {
     List<String> allOptions = new ArrayList<>();
 
     Intent theIntent;
+
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference myRef = database.getReference("Name List");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +82,7 @@ public class Matching_Type extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
         Collections.shuffle(allOptions); // Shuffle all options
         numMatches = Terms.length(); // Number of matches needed to win
 

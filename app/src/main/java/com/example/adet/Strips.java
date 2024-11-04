@@ -14,6 +14,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -36,6 +40,9 @@ public class Strips extends AppCompatActivity {
     private int wCounter = 0;
 
     Intent theIntent;
+
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference myRef = database.getReference("Name List");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,11 +92,61 @@ public class Strips extends AppCompatActivity {
             }
         });
 
-        JSONArray Defs = readJsonDef();
-        JSONArray Term = readJsonTerm();
+        myRef.child(theIntent.getStringExtra("Fname"))
+                .child("Notebook")
+                .child(theIntent.getStringExtra("Subject"))
+                .child(theIntent.getStringExtra("Topic"))
+                .child("Items")
+                .get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        int index = (int) task.getResult().getChildrenCount();
+                        ArrayList <String> termList = new ArrayList<>();
+                        ArrayList <String> definitionList = new ArrayList<>();
+                        for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                            termList.add(snapshot.getKey());
+                            definitionList.add(snapshot.getValue().toString());
+                        }
+
+                        ReturnValues(termList, definitionList, index);
+                    }
+                });
+
+        correct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cCounter++;
+                CCounter.setText(String.valueOf(cCounter));
+                invisConstrain.setVisibility(View.INVISIBLE);
+                showAnswer.setVisibility(View.INVISIBLE);
+                shownAnswer.setVisibility(View.INVISIBLE);
+                correct.setAlpha(0.5f);
+                wrong.setAlpha(0.5f);
+                correct.setClickable(false);
+                wrong.setClickable(false);
+            }
+        });
+        wrong.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                wCounter++;
+                WCounter.setText(String.valueOf(wCounter));
+                invisConstrain.setVisibility(View.INVISIBLE);
+                showAnswer.setVisibility(View.INVISIBLE);
+                shownAnswer.setVisibility(View.INVISIBLE);
+                correct.setAlpha(0.5f);
+                wrong.setAlpha(0.5f);
+                correct.setClickable(false);
+                wrong.setClickable(false);
+            }
+        });
+
+    }
+    private void ReturnValues(ArrayList<String> termList, ArrayList<String> defList, int index) {
+        ArrayList Defs = getDefs(defList);
+        ArrayList Term = getTerms(termList);
 
         try {
-            for (int i = 0; i < Defs.length(); i++) {
+            for (int i = 0; i < Defs.size(); i++) {
                 Object element = Defs.get(i);
                 Object element1 = Term.get(i);
                 if (element instanceof String) {
@@ -181,7 +238,7 @@ public class Strips extends AppCompatActivity {
                                 stripQuestion.setText(stringValue);
                             }
                         });
-                        }
+                    }
                     else if (i == 3) {
                         s4.setVisibility(View.VISIBLE);
                         s4.setClickable(true);
@@ -268,7 +325,7 @@ public class Strips extends AppCompatActivity {
                                 stripQuestion.setText(stringValue);
                             }
                         });
-                        }
+                    }
                     else if (i == 6) {
                         s7.setVisibility(View.VISIBLE);
                         s7.setClickable(true);
@@ -306,144 +363,13 @@ public class Strips extends AppCompatActivity {
         } catch (Exception e){
             e.printStackTrace();
         }
-
-        correct.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cCounter++;
-                CCounter.setText(String.valueOf(cCounter));
-                invisConstrain.setVisibility(View.INVISIBLE);
-                showAnswer.setVisibility(View.INVISIBLE);
-                shownAnswer.setVisibility(View.INVISIBLE);
-                correct.setAlpha(0.5f);
-                wrong.setAlpha(0.5f);
-                correct.setClickable(false);
-                wrong.setClickable(false);
-            }
-        });
-        wrong.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                wCounter++;
-                WCounter.setText(String.valueOf(wCounter));
-                invisConstrain.setVisibility(View.INVISIBLE);
-                showAnswer.setVisibility(View.INVISIBLE);
-                shownAnswer.setVisibility(View.INVISIBLE);
-                correct.setAlpha(0.5f);
-                wrong.setAlpha(0.5f);
-                correct.setClickable(false);
-                wrong.setClickable(false);
-            }
-        });
-
-    }
-    private JSONArray readJsonTerm() {
-        try {
-            InputStream inputStream = getAssets().open("sample.json");
-            int size = inputStream.available();
-            byte[] buffer = new byte[size];
-            inputStream.read(buffer);
-            inputStream.close();
-
-            String json;
-
-            json = new String(buffer, StandardCharsets.UTF_8);
-
-            return parseJsonTerm(json);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    private JSONArray parseJsonTerm(String jsonString) {
-        try {
-            JSONObject jsonObject = new JSONObject(jsonString);
-            JSONArray allTerm = new JSONArray();
-
-            // Extract the "Title"
-            String title = jsonObject.getString("Title");
-
-
-            // Get the "Content" array
-            JSONArray contentArray = jsonObject.getJSONArray("Content");
-
-            // Iterate through the "Content" array
-            for (int i = 0; i < contentArray.length(); i++) {
-                JSONObject sectionObject = contentArray.getJSONObject(i);
-                String sectionName = sectionObject.getString("Section");
-
-                if (sectionName.equals(theIntent.getStringExtra("title"))) {
-                    JSONArray itemArray = sectionObject.getJSONArray("Item");
-                    for (int j = 0; j < itemArray.length(); j++) {
-                        JSONObject itemObject = itemArray.getJSONObject(j);
-                        allTerm.put(itemObject.getString("Term"));
-                    }
-                    break;
-                }
-
-
-            }
-            return allTerm;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    private JSONArray readJsonDef() {
-        try {
-            InputStream inputStream = getAssets().open("sample.json");
-            int size = inputStream.available();
-            byte[] buffer = new byte[size];
-            inputStream.read(buffer);
-            inputStream.close();
-
-            String json;
-
-            json = new String(buffer, StandardCharsets.UTF_8);
-
-            return parseJsonDef(json);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    private JSONArray parseJsonDef(String jsonString) {
-        try {
-            JSONObject jsonObject = new JSONObject(jsonString);
-            JSONArray allDef = new JSONArray();
-
-            // Extract the "Title"
-            String title = jsonObject.getString("Title");
-
-
-            // Get the "Content" array
-            JSONArray contentArray = jsonObject.getJSONArray("Content");
-
-            // Iterate through the "Content" array
-            for (int i = 0; i < contentArray.length(); i++) {
-                JSONObject sectionObject = contentArray.getJSONObject(i);
-                String sectionName = sectionObject.getString("Section");
-
-                if (sectionName.equals(theIntent.getStringExtra("title"))) {
-                    JSONArray itemArray = sectionObject.getJSONArray("Item");
-                    for (int j = 0; j < itemArray.length(); j++) {
-                        JSONObject itemObject = itemArray.getJSONObject(j);
-                        allDef.put(itemObject.getString("Definition"));
-                    }
-                    break;
-                }
-
-
-            }
-            return allDef;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
+    private ArrayList<String> getTerms(ArrayList<String> termList) {
+        return termList;
+    }
+
+    private ArrayList<String> getDefs(ArrayList<String> defList) {
+        return defList;
+    }
 }

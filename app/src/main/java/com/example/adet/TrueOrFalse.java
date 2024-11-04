@@ -14,6 +14,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -38,6 +42,9 @@ public class TrueOrFalse extends AppCompatActivity {
     Random random = new Random();
     Intent theIntent;
 
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference myRef = database.getReference("Name List");
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,66 +65,30 @@ public class TrueOrFalse extends AppCompatActivity {
         Green = findViewById(R.id.Green);
         Red = findViewById(R.id.Red);
 
-        final int[] rndIndex = {readJsonRandomIndex()};
-        final int[] rndIndex2 = {readJsonRandomIndex()};
+        myRef.child(theIntent.getStringExtra("Fname"))
+                .child("Notebook")
+                .child(theIntent.getStringExtra("Subject"))
+                .child(theIntent.getStringExtra("Topic"))
+                .child("Items")
+                .get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        int index = (int) task.getResult().getChildrenCount();
+                        ArrayList <String> termList = new ArrayList<>();
+                        ArrayList <String> definitionList = new ArrayList<>();
+                        for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                            termList.add(snapshot.getKey());
+                            definitionList.add(snapshot.getValue().toString());
+                        }
 
-        Term = readJsonRandomTerm(rndIndex2[0]);
-        Definition = readJsonRandomDefinition(rndIndex[0]);
+                        ReturnValues(termList, definitionList, index);
+                    }
+                });
 
-        QuestionAnswer.setText("Is "+Term+"\n \n"+Definition);
-
-        Green.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (readJsonEqualTerm(rndIndex2[0], rndIndex[0], Term, Definition)) {
-                    counterC++;
-                    cCounter.setText(String.valueOf(counterC));
-                    rndIndex[0] = readJsonRandomIndex();
-                    rndIndex2[0] = readJsonRandomIndex();
-                    Term = readJsonRandomTerm(rndIndex2[0]);
-                    Definition = readJsonRandomDefinition(rndIndex[0]);
-                    QuestionAnswer.setText("Is "+Term+"\n \n"+Definition);
-                }
-                else {
-                    counterW++;
-                    wCounter.setText(String.valueOf(counterW));
-                    rndIndex[0] = readJsonRandomIndex();
-                    rndIndex2[0] = readJsonRandomIndex();
-                    Term = readJsonRandomTerm(rndIndex2[0]);
-                    Definition = readJsonRandomDefinition(rndIndex[0]);
-                    QuestionAnswer.setText("Is "+Term+"\n \n"+Definition);
-                }
-            }
-        });
-        Red.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (readJsonEqualTerm(rndIndex2[0], rndIndex[0], Term, Definition)) {
-                    counterW++;
-                    wCounter.setText(String.valueOf(counterW));
-                    rndIndex[0] = readJsonRandomIndex();
-                    rndIndex2[0] = readJsonRandomIndex();
-                    Term = readJsonRandomTerm(rndIndex2[0]);
-                    Definition = readJsonRandomDefinition(rndIndex[0]);
-                    QuestionAnswer.setText("Is "+Term+"\n \n"+Definition);
-                }
-                else {
-                    counterC++;
-                    cCounter.setText(String.valueOf(counterC));
-                    rndIndex[0] = readJsonRandomIndex();
-                    rndIndex2[0] = readJsonRandomIndex();
-                    Term = readJsonRandomTerm(rndIndex2[0]);
-                    Definition = readJsonRandomDefinition(rndIndex[0]);
-                    QuestionAnswer.setText("Is "+Term+"\n \n"+Definition);
-                }
-            }
-        });
         ekis.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(TrueOrFalse.this, Exit_Notice.class);
                 startActivity(intent);
-                finish();
             }
         });
         sidemenu.setOnClickListener(new View.OnClickListener() {
@@ -128,220 +99,75 @@ public class TrueOrFalse extends AppCompatActivity {
             }
         });
 
-
     }
-    private String readJsonRandomDefinition(int index) {
-        try {
-            InputStream inputStream = getAssets().open("sample.json");
-            int size = inputStream.available();
-            byte[] buffer = new byte[size];
-            inputStream.read(buffer);
-            inputStream.close();
+    private void ReturnValues(ArrayList <String> termList, ArrayList <String> definitionList, int index) {
 
-            String json;
+        final int[] rndIndex = {randomizingIndex(index)};
+        final int[] rndIndex2 = {randomizingIndex(index)};
 
-            json = new String(buffer, StandardCharsets.UTF_8);
+        Term = termList.get(rndIndex2[0]);
+        Definition = definitionList.get(rndIndex[0]);
 
-            return getRandomDefinition(json, index);
+        QuestionAnswer.setText("Is "+Term+"\n \n"+Definition);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            return  "";
-        }
-    }
-    private String getRandomDefinition(String jsonString, int index) {
-        try {
-            JSONObject jsonObject = new JSONObject(jsonString);
-            JSONArray contentArray = jsonObject.getJSONArray("Content");
-
-            // 1. Collect all definitions into a single list
-            JSONArray allDefinitions = new JSONArray();
-            for (int i = 0; i < contentArray.length(); i++) {
-                JSONObject sectionObject = contentArray.getJSONObject(i);
-                String sectionName = sectionObject.getString("Section");
-
-                if (sectionName.equals(theIntent.getStringExtra("title"))) {
-                    JSONArray itemArray = sectionObject.getJSONArray("Item");
-
-                    for (int j = 0; j < itemArray.length(); j++) {
-                        JSONObject itemObject = itemArray.getJSONObject(j);
-                        allDefinitions.put(itemObject.getString("Definition"));
-                    }
-                    break;
+        Green.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkEqual(rndIndex2[0], rndIndex[0], Term, Definition, termList, definitionList)) {
+                    counterC++;
+                    cCounter.setText(String.valueOf(counterC));
+                    rndIndex[0] = randomizingIndex(index);
+                    rndIndex2[0] = randomizingIndex(index);
+                    Term = termList.get(rndIndex2[0]);
+                    Definition = definitionList.get(rndIndex[0]);
+                    QuestionAnswer.setText("Is "+Term+"\n \n"+Definition);
                 }
-
-            }
-
-            // 2. Randomly select a definition from the combined list
-            if (allDefinitions.length() > 0) {
-                return allDefinitions.getString(index);
-            } else {
-                return "No definitions found.";
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Error processing JSON.";
-        }
-    }
-    private String readJsonRandomTerm(int index) {
-        try {
-            InputStream inputStream = getAssets().open("sample.json");
-            int size = inputStream.available();
-            byte[] buffer = new byte[size];
-            inputStream.read(buffer);
-            inputStream.close();
-
-            String json;
-
-            json = new String(buffer, StandardCharsets.UTF_8);
-
-            return getRandomTerm(json, index);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return  "";
-        }
-    }
-    private String getRandomTerm(String jsonString, int index) {
-        try {
-            JSONObject jsonObject = new JSONObject(jsonString);
-            JSONArray contentArray = jsonObject.getJSONArray("Content");
-
-            // 1. Collect all definitions into a single list
-            JSONArray allTerm = new JSONArray();
-            for (int i = 0; i < contentArray.length(); i++) {
-                JSONObject sectionObject = contentArray.getJSONObject(i);
-                String sectionName = sectionObject.getString("Section");
-
-                if (sectionName.equals(theIntent.getStringExtra("title"))) {
-                    JSONArray itemArray = sectionObject.getJSONArray("Item");
-
-                    for (int j = 0; j < itemArray.length(); j++) {
-                        JSONObject itemObject = itemArray.getJSONObject(j);
-                        allTerm.put(itemObject.getString("Term"));
-                    }
-                    break;
+                else {
+                    counterW++;
+                    wCounter.setText(String.valueOf(counterW));
+                    rndIndex[0] = randomizingIndex(index);
+                    rndIndex2[0] = randomizingIndex(index);
+                    Term = termList.get(rndIndex2[0]);
+                    Definition = definitionList.get(rndIndex[0]);
+                    QuestionAnswer.setText("Is "+Term+"\n \n"+Definition);
                 }
             }
-
-            // 2. Randomly select a definition from the combined list
-            if (allTerm.length() > 0) {
-                return allTerm .getString(index);
-            } else {
-                return "No definitions found.";
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Error processing JSON.";
-        }
-    }
-    private int readJsonRandomIndex() {
-        try {
-            InputStream inputStream = getAssets().open("sample.json");
-            int size = inputStream.available();
-            byte[] buffer = new byte[size];
-            inputStream.read(buffer);
-            inputStream.close();
-
-            String json;
-
-            json = new String(buffer, StandardCharsets.UTF_8);
-
-            return getRandomDefinitionIndex(json);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return -1;
-        }
-    }
-    private int getRandomDefinitionIndex(String jsonString) {
-        try {
-            JSONObject jsonObject = new JSONObject(jsonString);
-            JSONArray contentArray = jsonObject.getJSONArray("Content");
-
-            // 1. Collect indices of all definitions
-            List<Integer> definitionIndices = new ArrayList<>();
-            int indexCounter = 0;
-            for (int i = 0; i < contentArray.length(); i++) {
-                JSONObject sectionObject = contentArray.getJSONObject(i);
-                String sectionName = sectionObject.getString("Section");
-
-                if (sectionName.equals(theIntent.getStringExtra("title"))) {
-                    JSONArray itemArray = sectionObject.getJSONArray("Item");
-                    for (int j = 0; j < itemArray.length(); j++) {
-                        definitionIndices.add(indexCounter);
-                        indexCounter++;
-                    }
-                    break;
+        });
+        Red.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkEqual(rndIndex2[0], rndIndex[0], Term, Definition, termList, definitionList)) {
+                    counterW++;
+                    wCounter.setText(String.valueOf(counterW));
+                    rndIndex[0] = randomizingIndex(index);
+                    rndIndex2[0] = randomizingIndex(index);
+                    Term = termList.get(rndIndex2[0]);
+                    Definition = definitionList.get(rndIndex[0]);
+                    QuestionAnswer.setText("Is "+Term+"\n \n"+Definition);
                 }
-
-            }
-
-            // 2. Randomly select an index from the list
-            if (definitionIndices.size() > 0) {
-                int randomIndex = random.nextInt(definitionIndices.size());
-                return definitionIndices.get(randomIndex);
-            } else {
-                return -1; // No definitions found
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return -1; // Error processing JSON
-        }
-    }
-    private boolean readJsonEqualTerm(int index2, int index, String Term, String Definition) {
-        try {
-            InputStream inputStream = getAssets().open("sample.json");
-            int size = inputStream.available();
-            byte[] buffer = new byte[size];
-            inputStream.read(buffer);
-            inputStream.close();
-
-            String json;
-
-            json = new String(buffer, StandardCharsets.UTF_8);
-
-            return equalToIndex(json, index2, index, Term, Definition);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-    private boolean equalToIndex(String jsonString, int index2, int index, String Term, String Definition) {
-        try {
-            JSONObject jsonObject = new JSONObject(jsonString);
-            JSONArray contentArray = jsonObject.getJSONArray("Content");
-
-            JSONArray allDef = new JSONArray();
-            JSONArray allTerm = new JSONArray();
-            for(int i = 0; i < contentArray.length(); i++) {
-                JSONObject sectionObject = contentArray.getJSONObject(i);
-                String sectionName = sectionObject.getString("Section");
-
-                if (sectionName.equals(theIntent.getStringExtra("title"))) {
-                    JSONArray itemArray = sectionObject.getJSONArray("Item");
-                    for (int j = 0; j < itemArray.length(); j++) {
-                        JSONObject itemObject = itemArray.getJSONObject(j);
-                        allDef.put(itemObject.getString("Definition"));
-                        allTerm.put(itemObject.getString("Term"));
-                    }
-                    break;
+                else {
+                    counterC++;
+                    cCounter.setText(String.valueOf(counterC));
+                    rndIndex[0] = randomizingIndex(index);
+                    rndIndex2[0] = randomizingIndex(index);
+                    Term = termList.get(rndIndex2[0]);
+                    Definition = definitionList.get(rndIndex[0]);
+                    QuestionAnswer.setText("Is "+Term+"\n \n"+Definition);
                 }
             }
-            if(Term.equals(allTerm.getString(index)) && Definition.equals(allDef.getString(index2))){
-                return true;
-            }
-            else {
-                return false;
-            }
+        });
+    }
+
+    private int randomizingIndex(int index) {
+        Random random = new Random();
+        return random.nextInt(index);
+    }
+
+    private boolean checkEqual(int rndIndex2, int rndIndex, String Term, String Definition, ArrayList <String> termList, ArrayList <String> definitionList) {
+        if (Term.equals(termList.get(rndIndex)) && Definition.equals(definitionList.get(rndIndex2))) {
+            return true;
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
+        else {
             return false;
         }
     }

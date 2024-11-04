@@ -94,6 +94,7 @@ public class Topic_Selection extends AppCompatActivity {
                                             intent1.putExtra("Subject", Subject);
                                             intent1.putExtra("Topic", Topic);
                                             startActivity(intent1);
+                                            finish();
                                             break;
                                         case "Flashcards":
                                             Intent intent2 = new Intent(Topic_Selection.this, Flashcards.class);
@@ -101,6 +102,7 @@ public class Topic_Selection extends AppCompatActivity {
                                             intent2.putExtra("Subject", Subject);
                                             intent2.putExtra("Topic", Topic);
                                             startActivity(intent2);
+                                            finish();
                                             break;
                                         case "Strips":
                                             Intent intent3 = new Intent(Topic_Selection.this, Strips.class);
@@ -108,6 +110,7 @@ public class Topic_Selection extends AppCompatActivity {
                                             intent3.putExtra("Subject", Subject);
                                             intent3.putExtra("Topic", Topic);
                                             startActivity(intent3);
+                                            finish();
                                             break;
                                         case "ToF":
                                             Intent intent4 = new Intent(Topic_Selection.this, TrueOrFalse.class);
@@ -115,6 +118,7 @@ public class Topic_Selection extends AppCompatActivity {
                                             intent4.putExtra("Subject", Subject);
                                             intent4.putExtra("Topic", Topic);
                                             startActivity(intent4);
+                                            finish();
                                             break;
                                         case "Matching":
                                             Intent intent5 = new Intent(Topic_Selection.this, Matching_Type.class);
@@ -122,6 +126,7 @@ public class Topic_Selection extends AppCompatActivity {
                                             intent5.putExtra("Subject", Subject);
                                             intent5.putExtra("Topic", Topic);
                                             startActivity(intent5);
+                                            finish();
                                             break;
                                         default:
                                             break;
