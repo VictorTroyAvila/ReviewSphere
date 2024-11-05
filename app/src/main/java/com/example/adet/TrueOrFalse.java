@@ -3,12 +3,14 @@ package com.example.adet;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -87,8 +89,41 @@ public class TrueOrFalse extends AppCompatActivity {
         ekis.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(TrueOrFalse.this, Exit_Notice.class);
-                startActivity(intent);
+                // Inflate the custom layout
+                LayoutInflater inflater = getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.dialog_exit_notice, null);
+
+                // Create an AlertDialog.Builder
+                AlertDialog.Builder builder = new AlertDialog.Builder(TrueOrFalse.this);
+
+                // Set the custom view
+                builder.setView(dialogView);
+
+                // Get references to UI elements
+                TextView confirmButton = dialogView.findViewById(R.id.confrim);
+                TextView cancelButton = dialogView.findViewById(R.id.cancel);
+
+                // Show the dialog
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+                confirmButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(TrueOrFalse.this, Home.class);
+                        intent.putExtra("title", theIntent.getStringExtra("Fname"));
+                        startActivity(intent);
+                        dialog.dismiss();
+                        finish();
+                    }
+                });
+
+                cancelButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
             }
         });
         sidemenu.setOnClickListener(new View.OnClickListener() {

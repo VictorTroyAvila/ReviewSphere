@@ -2,6 +2,7 @@ package com.example.adet;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -12,6 +13,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -41,7 +43,8 @@ public class Matching_Type extends AppCompatActivity {
     private Button selectedButton2 = null;
 
     private int numMatches = 0;
-    List<String> termsList = new ArrayList<>();List<String> defsList = new ArrayList<>();
+    List<String> termsList = new ArrayList<>();
+    List<String> defsList = new ArrayList<>();
     List<String> allOptions = new ArrayList<>();
 
     Intent theIntent;
@@ -67,24 +70,88 @@ public class Matching_Type extends AppCompatActivity {
         Selected1 = findViewById(R.id.Selected1);
         Selected2 = findViewById(R.id.Selected2);
 
-        JSONArray Terms = readJsonTerm();
-        JSONArray Defs = readJsonDef();
+        myRef.child(theIntent.getStringExtra("Fname"))
+                .child("Notebook")
+                .child(theIntent.getStringExtra("Subject"))
+                .child(theIntent.getStringExtra("Topic"))
+                .child("Items")
+                .get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        int index = (int) task.getResult().getChildrenCount();
+                        ArrayList <String> termList = new ArrayList<>();
+                        ArrayList <String> definitionList = new ArrayList<>();
+                        for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                            termList.add(snapshot.getKey());
+                            definitionList.add(snapshot.getValue().toString());
+                        }
 
-        try {
-            for (int i = 0; i < Terms.length(); i++) {
-                termsList.add(Terms.getString(i));
-                allOptions.add(Terms.getString(i));
+                        ReturnValues(termList, definitionList, index);
+                    }
+                });
+
+        ekis.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Inflate the custom layout
+                LayoutInflater inflater = getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.dialog_exit_notice, null);
+
+                // Create an AlertDialog.Builder
+                AlertDialog.Builder builder = new AlertDialog.Builder(Matching_Type.this);
+
+                // Set the custom view
+                builder.setView(dialogView);
+
+                // Get references to UI elements
+                TextView confirmButton = dialogView.findViewById(R.id.confrim);
+                TextView cancelButton = dialogView.findViewById(R.id.cancel);
+
+                // Show the dialog
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+                confirmButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(Matching_Type.this, Home.class);
+                        intent.putExtra("title", theIntent.getStringExtra("Fname"));
+                        startActivity(intent);
+                        dialog.dismiss();
+                        finish();
+                    }
+                });
+
+                cancelButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
             }
-            for (int i = 0; i< Defs.length(); i++) {
-                defsList.add(Defs.getString(i));
-                allOptions.add(Defs.getString(i));
+        });
+        sidemenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Matching_Type.this, Side_Menu.class);
+                startActivity(intent);
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        });
+    }
+    private void ReturnValues(ArrayList <String> termList, ArrayList <String> definitionList, int index) {
+        ArrayList<String> Terms = termList;
+        ArrayList<String> Defs = definitionList;
+
+            for (int i = 0; i < Terms.size(); i++) {
+                termsList.add(Terms.get(i));
+                allOptions.add(Terms.get(i));
+            }
+            for (int i = 0; i< Defs.size(); i++) {
+                defsList.add(Defs.get(i));
+                allOptions.add(Defs.get(i));
+            }
 
         Collections.shuffle(allOptions); // Shuffle all options
-        numMatches = Terms.length(); // Number of matches needed to win
+        numMatches = Terms.size(); // Number of matches needed to win
 
         int numButtons = allOptions.size();
         int numRows = (int) Math.ceil((double) numButtons / 5); // Calculate number of rows
@@ -122,23 +189,8 @@ public class Matching_Type extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        ekis.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Matching_Type.this, Exit_Notice.class);
-                startActivity(intent);
-                finish();
-            }
-        });
-        sidemenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Matching_Type.this, Side_Menu.class);
-                startActivity(intent);
-            }
-        });
     }
+
     private void handleButtonClick(Button button) {
         Selected1.setVisibility(View.VISIBLE);
         Selected2.setVisibility(View.VISIBLE);
@@ -287,20 +339,6 @@ public class Matching_Type extends AppCompatActivity {
             e.printStackTrace();
             return null;
         }
-    }
-    private List<String> Shuffle (JSONArray jsonArray) {
-        List<String> optionsList =new ArrayList<>();
-        try {
-            for (int i = 0; i < jsonArray.length(); i++) {
-                optionsList.add(jsonArray.getString(i));
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        Collections.shuffle(optionsList);
-
-        return optionsList;
     }
 
 }
