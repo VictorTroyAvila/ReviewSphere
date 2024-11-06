@@ -18,6 +18,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,6 +48,9 @@ public class Quiz extends AppCompatActivity {
     Random random = new Random();
     Intent theIntent;
 
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference myRef = database.getReference("Name List");
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,11 +69,102 @@ public class Quiz extends AppCompatActivity {
         content_Container = findViewById(R.id.content_Container);
         toScore = findViewById(R.id.toScore);
 
-        JSONArray Term = readJsonTerm();
-        JSONArray Defs = readJsonDef();
+        String Fname = theIntent.getStringExtra("Fname");
+        String Subject = theIntent.getStringExtra("Subject");
+        String Topic = theIntent.getStringExtra("Topic");
 
-        try {
-            for (int i = 0; i < Defs.length(); i++) {
+        if (Fname != null && Subject != null && Topic != null){
+            myRef.child(theIntent.getStringExtra("Fname"))
+                    .child("Notebook")
+                    .child(theIntent.getStringExtra("Subject"))
+                    .child(theIntent.getStringExtra("Topic"))
+                    .child("Items")
+                    .get().addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            int index = (int) task.getResult().getChildrenCount();
+                            ArrayList <String> termList = new ArrayList<>();
+                            ArrayList <String> definitionList = new ArrayList<>();
+                            for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                                termList.add(snapshot.getKey());
+                                definitionList.add(snapshot.getValue().toString());
+                            }
+
+                            ReturnValues(termList, definitionList, index);
+                        }
+                    });
+        }
+
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int correctCount = 0;
+                for (int i = 0; i < correctAnswers.size(); i++) {
+                    if (correctAnswers.get(i).equals(selectedAnswers.get(i))) {
+                        correctCount++;
+                        toScore.setText("Score: "+correctCount);
+                    }
+                    else
+                    {
+                        System.out.println("Ala mali");
+                    }
+                }
+            }
+        });
+        ekis.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Inflate the custom layout
+                LayoutInflater inflater = getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.dialog_exit_notice, null);
+
+                // Create an AlertDialog.Builder
+                AlertDialog.Builder builder = new AlertDialog.Builder(Quiz.this);
+
+                // Set the custom view
+                builder.setView(dialogView);
+
+                // Get references to UI elements
+                TextView confirmButton = dialogView.findViewById(R.id.confrim);
+                TextView cancelButton = dialogView.findViewById(R.id.cancel);
+
+                // Show the dialog
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+                confirmButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(Quiz.this, Home.class);
+                        intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
+                        startActivity(intent);
+                        dialog.dismiss();
+                        finish();
+                    }
+                });
+
+                cancelButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+            }
+        });
+        sidemenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Quiz.this, Side_Menu.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void ReturnValues(ArrayList <String> termList, ArrayList <String> definitionList, int index) {
+
+        ArrayList<String> Defs = definitionList;
+        ArrayList<String> Term = termList;
+
+            for (int i = 0; i < Defs.size(); i++) {
                 Object element = Defs.get(i);
                 Object element1 = Term.get(i);
                 try {
@@ -123,11 +221,11 @@ public class Quiz extends AppCompatActivity {
                         // Set radio button texts, placing correct answer randomly
                         Set<Integer> usedIndices = new HashSet<>();
                         for (int j = 0; j < 4; j++) {
-                            int index;
+                            int indexx;
                             do {
-                                index = random.nextInt(optionsList.size());
-                            } while (usedIndices.contains(index));
-                            usedIndices.add(index);
+                                indexx = random.nextInt(optionsList.size());
+                            } while (usedIndices.contains(indexx));
+                            usedIndices.add(indexx);
 
                             RadioButton currentButton = null;
                             switch (j) {
@@ -181,191 +279,13 @@ public class Quiz extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        submit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int correctCount = 0;
-                for (int i = 0; i < correctAnswers.size(); i++) {
-                    if (correctAnswers.get(i).equals(selectedAnswers.get(i))) {
-                        correctCount++;
-                        toScore.setText("Score: "+correctCount);
-                    }
-                    else
-                    {
-                        System.out.println("Ala mali");
-                    }
-                }
-            }
-        });
-        ekis.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Inflate the custom layout
-                LayoutInflater inflater = getLayoutInflater();
-                View dialogView = inflater.inflate(R.layout.dialog_exit_notice, null);
-
-                // Create an AlertDialog.Builder
-                AlertDialog.Builder builder = new AlertDialog.Builder(Quiz.this);
-
-                // Set the custom view
-                builder.setView(dialogView);
-
-                // Get references to UI elements
-                TextView confirmButton = dialogView.findViewById(R.id.confrim);
-                TextView cancelButton = dialogView.findViewById(R.id.cancel);
-
-                // Show the dialog
-                AlertDialog dialog = builder.create();
-                dialog.show();
-
-                confirmButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(Quiz.this, Home.class);
-                        intent.putExtra("title", theIntent.getStringExtra("Fname"));
-                        startActivity(intent);
-                        dialog.dismiss();
-                        finish();
-                    }
-                });
-
-                cancelButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                    }
-                });
-            }
-        });
-        sidemenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Quiz.this, Side_Menu.class);
-                startActivity(intent);
-            }
-        });
     }
-    private JSONArray readJsonTerm() {
-        try {
-            InputStream inputStream = getAssets().open("sample.json");
-            int size = inputStream.available();
-            byte[] buffer = new byte[size];
-            inputStream.read(buffer);
-            inputStream.close();
 
-            String json;
-
-            json = new String(buffer, StandardCharsets.UTF_8);
-
-            return parseJsonTerm(json);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    private JSONArray parseJsonTerm(String jsonString) {
-        try {
-            JSONObject jsonObject = new JSONObject(jsonString);
-            JSONArray allTerm = new JSONArray();
-
-            // Extract the "Title"
-            String title = jsonObject.getString("Title");
-
-
-            // Get the "Content" array
-            JSONArray contentArray = jsonObject.getJSONArray("Content");
-
-            // Iterate through the "Content" array
-            for (int i = 0; i < contentArray.length(); i++) {
-                JSONObject sectionObject = contentArray.getJSONObject(i);
-                String sectionName = sectionObject.getString("Section");
-
-                if (sectionName.equals(theIntent.getStringExtra("title"))) {
-                    JSONArray itemArray = sectionObject.getJSONArray("Item");
-                    for (int j = 0; j < itemArray.length(); j++) {
-                        JSONObject itemObject = itemArray.getJSONObject(j);
-                        allTerm.put(itemObject.getString("Term"));
-                    }
-                    break;
-                }
-
-
+    private List<String> Shuffle (ArrayList Term) {
+        ArrayList<String> optionsList =new ArrayList<>();
+            for (int i = 0; i < Term.size(); i++) {
+                optionsList.add(Term.get(i).toString());
             }
-            return allTerm;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    private JSONArray readJsonDef() {
-        try {
-            InputStream inputStream = getAssets().open("sample.json");
-            int size = inputStream.available();
-            byte[] buffer = new byte[size];
-            inputStream.read(buffer);
-            inputStream.close();
-
-            String json;
-
-            json = new String(buffer, StandardCharsets.UTF_8);
-
-            return parseJsonDef(json);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    private JSONArray parseJsonDef(String jsonString) {
-        try {
-            JSONObject jsonObject = new JSONObject(jsonString);
-            JSONArray allDef = new JSONArray();
-
-            // Extract the "Title"
-            String title = jsonObject.getString("Title");
-
-
-            // Get the "Content" array
-            JSONArray contentArray = jsonObject.getJSONArray("Content");
-
-            // Iterate through the "Content" array
-            for (int i = 0; i < contentArray.length(); i++) {
-                JSONObject sectionObject = contentArray.getJSONObject(i);
-                String sectionName = sectionObject.getString("Section");
-
-                if (sectionName.equals(theIntent.getStringExtra("title"))) {
-                    JSONArray itemArray = sectionObject.getJSONArray("Item");
-                    for (int j = 0; j < itemArray.length(); j++) {
-                        JSONObject itemObject = itemArray.getJSONObject(j);
-                        allDef.put(itemObject.getString("Definition"));
-                    }
-                    break;
-                }
-
-
-            }
-            return allDef;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    private List<String> Shuffle (JSONArray jsonArray) {
-        List<String> optionsList =new ArrayList<>();
-        try {
-            for (int i = 0; i < jsonArray.length(); i++) {
-                optionsList.add(jsonArray.getString(i));
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 
         Collections.shuffle(optionsList);
 
