@@ -455,7 +455,7 @@ public class Notebook extends AppCompatActivity {
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if (task.isSuccessful()) {
                     boolean exist = false;
-                    if (myRef.child(Acc).child("Notebook").child(Subject).getKey().equalsIgnoreCase(Subject)){
+                    if (task.getResult().exists()){
                         exist = true;
                     }
                     else {
@@ -475,7 +475,7 @@ public class Notebook extends AppCompatActivity {
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if (task.isSuccessful()) {
                     boolean exist = false;
-                    if (myRef.child(Acc).child("Notebook").child(Subject).child(Topic).getKey().equalsIgnoreCase(Topic)){
+                    if (task.getResult().exists()){
                         exist = true;
                     }
                     else {

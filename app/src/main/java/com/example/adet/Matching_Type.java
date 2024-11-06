@@ -29,6 +29,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,24 +71,30 @@ public class Matching_Type extends AppCompatActivity {
         Selected1 = findViewById(R.id.Selected1);
         Selected2 = findViewById(R.id.Selected2);
 
-        myRef.child(theIntent.getStringExtra("Fname"))
-                .child("Notebook")
-                .child(theIntent.getStringExtra("Subject"))
-                .child(theIntent.getStringExtra("Topic"))
-                .child("Items")
-                .get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        int index = (int) task.getResult().getChildrenCount();
-                        ArrayList <String> termList = new ArrayList<>();
-                        ArrayList <String> definitionList = new ArrayList<>();
-                        for (DataSnapshot snapshot : task.getResult().getChildren()) {
-                            termList.add(snapshot.getKey());
-                            definitionList.add(snapshot.getValue().toString());
-                        }
+        String Fname = theIntent.getStringExtra("Fname");
+        String Subject = theIntent.getStringExtra("Subject");
+        String Topic = theIntent.getStringExtra("Topic");
 
-                        ReturnValues(termList, definitionList, index);
-                    }
-                });
+        if (Fname != null && Subject != null && Topic != null){
+            myRef.child(theIntent.getStringExtra("Fname"))
+                    .child("Notebook")
+                    .child(theIntent.getStringExtra("Subject"))
+                    .child(theIntent.getStringExtra("Topic"))
+                    .child("Items")
+                    .get().addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            int index = (int) task.getResult().getChildrenCount();
+                            ArrayList <String> termList = new ArrayList<>();
+                            ArrayList <String> definitionList = new ArrayList<>();
+                            for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                                termList.add(snapshot.getKey());
+                                definitionList.add(snapshot.getValue().toString());
+                            }
+
+                            ReturnValues(termList, definitionList, index);
+                        }
+                    });
+        }
 
         ekis.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,7 +121,7 @@ public class Matching_Type extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(Matching_Type.this, Home.class);
-                        intent.putExtra("title", theIntent.getStringExtra("Fname"));
+                        intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
                         startActivity(intent);
                         dialog.dismiss();
                         finish();
