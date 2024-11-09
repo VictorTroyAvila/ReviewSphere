@@ -165,8 +165,8 @@ public class Notebook_Data extends AppCompatActivity {
                 Submit.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String TermText = Term.getText().toString();
-                        String DefinitionText = Definition.getText().toString();
+                        String TermText = Term.getText().toString().replaceAll("\\s$","");
+                        String DefinitionText = Definition.getText().toString().replaceAll("\\s$","");
 
                         if (TermText.equals("") || DefinitionText.equals("")) {
                             AlertDialog alertDialog = new AlertDialog.Builder(Notebook_Data.this).create();

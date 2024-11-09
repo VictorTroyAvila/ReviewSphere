@@ -147,8 +147,8 @@ public class Notebook extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
-                    String SubjectTitle = subjectTitle.getText().toString();
-                    String TopicTitle = topicTitle.getText().toString();
+                    String SubjectTitle = subjectTitle.getText().toString().replaceAll("\\s$","");
+                    String TopicTitle = topicTitle.getText().toString().replaceAll("\\s$","");
 
                     Map<String, Object> data = new HashMap<>();
                     data.put("Term", "Definition");

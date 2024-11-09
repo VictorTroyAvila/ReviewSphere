@@ -46,9 +46,9 @@ public class MainActivity extends AppCompatActivity {
         Login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String NameText = FullName.getText().toString();
-                String EmailText = Email.getText().toString();
-                String PasswordText = Password.getText().toString();
+                String NameText = FullName.getText().toString().replaceAll("\\s$","");
+                String EmailText = Email.getText().toString().replaceAll("\\s$","");
+                String PasswordText = Password.getText().toString().replaceAll("\\s$","");
 
                 Checking(NameText, EmailText, PasswordText, new BooleanCallback() {
                     @Override
