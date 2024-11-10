@@ -60,6 +60,7 @@
     <string name="optional">Optional</string>
     <string name="term">Term</string>
     <string name="definition">Definition</string>
+    <string name="save">Save</string>
 
     <string-array name="gender">
         <item>Male</item>
