@@ -61,9 +61,9 @@ public class Sign_Up extends AppCompatActivity {
                     else
                     {
                         Intent intent = new Intent(Sign_Up.this, AddInfo.class);
-                        intent.putExtra("email", Email.getText().toString().replaceAll("\\s$", ""));
-                        intent.putExtra("password", Password.getText().toString().replaceAll("\\s$", ""));
-                        intent.putExtra("fullName", FullName.getText().toString().replaceAll("\\s$", ""));
+                        intent.putExtra("email", EmailText);
+                        intent.putExtra("password", PasswordText);
+                        intent.putExtra("fullName", FullNameText);
                         startActivity(intent);
                     }
                 }

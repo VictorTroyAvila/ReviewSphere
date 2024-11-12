@@ -47,7 +47,7 @@ public class Home extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Home.this, Topic_Selection.class);
-                intent.putExtra("title", "Flashcards");
+                intent.putExtra("title", "FlashCards");
                 intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
                 startActivity(intent);
             }

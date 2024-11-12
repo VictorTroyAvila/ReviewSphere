@@ -93,14 +93,16 @@ public class Topic_Selection extends AppCompatActivity {
                                             intent1.putExtra("Fname", theIntent.getStringExtra("Fname"));
                                             intent1.putExtra("Subject", Subject);
                                             intent1.putExtra("Topic", Topic);
+
                                             startActivity(intent1);
                                             finish();
                                             break;
-                                        case "Flashcards":
+                                        case "FlashCards":
                                             Intent intent2 = new Intent(Topic_Selection.this, Flashcards.class);
                                             intent2.putExtra("Fname", theIntent.getStringExtra("Fname"));
                                             intent2.putExtra("Subject", Subject);
                                             intent2.putExtra("Topic", Topic);
+                                            AddPlays ();
                                             startActivity(intent2);
                                             finish();
                                             break;
@@ -109,14 +111,16 @@ public class Topic_Selection extends AppCompatActivity {
                                             intent3.putExtra("Fname", theIntent.getStringExtra("Fname"));
                                             intent3.putExtra("Subject", Subject);
                                             intent3.putExtra("Topic", Topic);
+                                            AddPlays ();
                                             startActivity(intent3);
                                             finish();
                                             break;
-                                        case "ToF":
+                                        case "TrueFalse":
                                             Intent intent4 = new Intent(Topic_Selection.this, TrueOrFalse.class);
                                             intent4.putExtra("Fname", theIntent.getStringExtra("Fname"));
                                             intent4.putExtra("Subject", Subject);
                                             intent4.putExtra("Topic", Topic);
+                                            AddPlays ();
                                             startActivity(intent4);
                                             finish();
                                             break;
@@ -125,6 +129,7 @@ public class Topic_Selection extends AppCompatActivity {
                                             intent5.putExtra("Fname", theIntent.getStringExtra("Fname"));
                                             intent5.putExtra("Subject", Subject);
                                             intent5.putExtra("Topic", Topic);
+                                            AddPlays ();
                                             startActivity(intent5);
                                             finish();
                                             break;
@@ -150,5 +155,23 @@ public class Topic_Selection extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    private void AddPlays () {
+        myRef.child(theIntent.getStringExtra("Fname"))
+                .child("User Info")
+                .child("Performance")
+                .child(theIntent.getStringExtra("title"))
+                .child("No Plays")
+                .get().addOnSuccessListener(dataSnapshot -> {
+                    Long plays = dataSnapshot.getValue(Long.class);
+                    plays++;
+                    myRef.child(theIntent.getStringExtra("Fname"))
+                            .child("User Info")
+                            .child("Performance")
+                            .child(theIntent.getStringExtra("title"))
+                            .child("No Plays")
+                            .setValue(plays);
+                });
     }
 }

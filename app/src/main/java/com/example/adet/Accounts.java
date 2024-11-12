@@ -64,49 +64,49 @@ public class Accounts extends AppCompatActivity {
                     Gender.setText(dataSnapshot.getValue(String.class));
                 });
 
-//        myRef.child(theIntent.getStringExtra("Fname"))
-//                .child("User Info")
-//                .child("Performance")
-//                .child("FlashCards")
-//                .child("No Plays")
-//                .get().addOnSuccessListener(dataSnapshot -> {
-//                    Flashcard_plays.setText(dataSnapshot.getValue(String.class));
-//                });
-//
-//        myRef.child(theIntent.getStringExtra("Fname"))
-//                .child("User Info")
-//                .child("Performance")
-//                .child("Matching")
-//                .child("No Plays")
-//                .get().addOnSuccessListener(dataSnapshot -> {
-//                    Matching_plays.setText(dataSnapshot.getValue(String.class));
-//                });
-//
-//        myRef.child(theIntent.getStringExtra("Fname"))
-//                .child("User Info")
-//                .child("Performance")
-//                .child("Quizzes")
-//                .child("No Plays")
-//                .get().addOnSuccessListener(dataSnapshot -> {
-//                    Quiz_plays.setText(dataSnapshot.getValue(String.class));
-//                });
-//
-//        myRef.child(theIntent.getStringExtra("Fname"))
-//                .child("User Info")
-//                .child("Performance")
-//                .child("Strips")
-//                .child("No Plays")
-//                .get().addOnSuccessListener(dataSnapshot -> {
-//                    Strips_plays.setText(dataSnapshot.getValue(String.class));
-//                });
-//
-//        myRef.child(theIntent.getStringExtra("Fname"))
-//                .child("User Info")
-//                .child("Performance")
-//                .child("TrueFalse")
-//                .child("No Plays")
-//                .get().addOnSuccessListener(dataSnapshot -> {
-//                    ToF_plays.setText(dataSnapshot.getValue(String.class));
-//                });
+        myRef.child(theIntent.getStringExtra("Fname"))
+                .child("User Info")
+                .child("Performance")
+                .child("FlashCards")
+                .child("No Plays")
+                .get().addOnSuccessListener(dataSnapshot -> {
+                    Flashcard_plays.setText("" + dataSnapshot.getValue(Long.class));
+                });
+
+        myRef.child(theIntent.getStringExtra("Fname"))
+                .child("User Info")
+                .child("Performance")
+                .child("Matching")
+                .child("No Plays")
+                .get().addOnSuccessListener(dataSnapshot -> {
+                    Matching_plays.setText("" + dataSnapshot.getValue(Long.class));
+                });
+
+        myRef.child(theIntent.getStringExtra("Fname"))
+                .child("User Info")
+                .child("Performance")
+                .child("Quizzes")
+                .child("No Plays")
+                .get().addOnSuccessListener(dataSnapshot -> {
+                    Quiz_plays.setText("" + dataSnapshot.getValue(Long.class));
+                });
+
+        myRef.child(theIntent.getStringExtra("Fname"))
+                .child("User Info")
+                .child("Performance")
+                .child("Strips")
+                .child("No Plays")
+                .get().addOnSuccessListener(dataSnapshot -> {
+                    Strips_plays.setText("" + dataSnapshot.getValue(Long.class));
+                });
+
+        myRef.child(theIntent.getStringExtra("Fname"))
+                .child("User Info")
+                .child("Performance")
+                .child("TrueFalse")
+                .child("No Plays")
+                .get().addOnSuccessListener(dataSnapshot -> {
+                    ToF_plays.setText("" + dataSnapshot.getValue(Long.class));
+                });
     }
 }

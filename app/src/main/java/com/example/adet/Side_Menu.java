@@ -14,7 +14,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class Side_Menu extends AppCompatActivity {
 
-    private TextView click_home, click_notebook, click_quizzes, click_flashcards, click_wheel, click_strips, click_ToF, click_matching;
+    private TextView click_home, click_notebook, click_quizzes, click_flashcards, click_wheel, click_strips, click_ToF, click_matching, click_accounts;
     private ImageView sidemenu_return;
 
     Intent theIntent;
@@ -70,7 +70,7 @@ public class Side_Menu extends AppCompatActivity {
         click_flashcards.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                intent.putExtra("title", "Flashcards");
+                intent.putExtra("title", "FlashCards");
                 intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
                 startActivity(intent);
                 finish();
@@ -92,7 +92,7 @@ public class Side_Menu extends AppCompatActivity {
         click_ToF.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                intent.putExtra("title", "ToF");
+                intent.putExtra("title", "TrueFalse");
                 intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
                 startActivity(intent);
                 finish();
@@ -106,6 +106,17 @@ public class Side_Menu extends AppCompatActivity {
                 intent.putExtra("title", "Matching");
                 intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
                 startActivity(intent);
+                finish();
+            }
+        });
+
+        click_accounts = findViewById(R.id.sidemenu_Accounts);
+        click_accounts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent accountsIntent = new Intent(Side_Menu.this, Accounts.class);
+                accountsIntent.putExtra("Fname", theIntent.getStringExtra("Fname"));
+                startActivity(accountsIntent);
                 finish();
             }
         });
