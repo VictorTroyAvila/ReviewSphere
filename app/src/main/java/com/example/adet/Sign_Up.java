@@ -44,9 +44,9 @@ public class Sign_Up extends AppCompatActivity {
         tologin = findViewById(R.id.toLogin);
 
         SignUp.setOnClickListener(v -> {
-            String EmailText = Email.getText().toString();
-            String PasswordText = Password.getText().toString();
-            String FullNameText = FullName.getText().toString();
+            String EmailText = Email.getText().toString().replaceAll("\\s$", "");
+            String PasswordText = Password.getText().toString().replaceAll("\\s$", "");
+            String FullNameText = FullName.getText().toString().replaceAll("\\s$", "");
 
             Checking(FullNameText, EmailText, PasswordText, new BooleanCallback() {
                 @Override
@@ -61,9 +61,9 @@ public class Sign_Up extends AppCompatActivity {
                     else
                     {
                         Intent intent = new Intent(Sign_Up.this, AddInfo.class);
-                        intent.putExtra("email", Email.getText().toString());
-                        intent.putExtra("password", Password.getText().toString());
-                        intent.putExtra("fullName", FullName.getText().toString());
+                        intent.putExtra("email", Email.getText().toString().replaceAll("\\s$", ""));
+                        intent.putExtra("password", Password.getText().toString().replaceAll("\\s$", ""));
+                        intent.putExtra("fullName", FullName.getText().toString().replaceAll("\\s$", ""));
                         startActivity(intent);
                     }
                 }

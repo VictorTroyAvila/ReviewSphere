@@ -214,5 +214,29 @@
                 android:textSize="24sp" />
         </TableRow>
 
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <ImageView
+                android:id="@+id/imageView4"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="6sp"
+                android:padding="5sp"
+                app:srcCompat="@drawable/medal" />
+
+            <TextView
+                android:id="@+id/sidemenu_Accounts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:padding="9sp"
+                android:text="@string/accounts"
+                android:textColor="@color/white"
+                android:textSize="24sp" />
+        </TableRow>
+
     </TableLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

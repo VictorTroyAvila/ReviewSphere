@@ -80,7 +80,6 @@ public class AddInfo extends AppCompatActivity {
 
             Map<String, Object> gameStats = new HashMap<>();
             gameStats.put("No Plays", 0);
-            gameStats.put("Avg  Score", 0);
 
             Map<String, Object> games = new HashMap<>();
             games.put("Quizzes", gameStats);
