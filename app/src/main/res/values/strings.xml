@@ -63,6 +63,8 @@
     <string name="edit_profile">Edit Profile</string>
     <string name="school">School</string>
     <string name="plays">Plays</string>
+    <string name="forimport">Import</string>
+    <string name="forexport">Export</string>
 
     <string-array name="gender">
         <item>Male</item>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -14,15 +14,6 @@
         tools:targetApi="31">
         <activity
             android:name=".Accounts"
-            android:exported="false" />
-        <activity
-            android:name=".Delete_note"
-            android:exported="false" />
-        <activity
-            android:name=".Edit_note"
-            android:exported="false" />
-        <activity
-            android:name=".Add_note"
             android:exported="false" />
         <activity
             android:name=".Sign_Up"
@@ -56,13 +47,7 @@
             android:name=".Notebook"
             android:exported="false" />
         <activity
-            android:name=".Loading_Screen"
-            android:exported="false" />
-        <activity
             android:name=".AddInfo"
-            android:exported="false" />
-        <activity
-            android:name=".Exit_Notice"
             android:exported="false" />
         <activity
             android:name=".Side_Menu"
