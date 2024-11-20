@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.DocumentsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,7 +36,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -451,13 +452,90 @@ public class Notebook extends AppCompatActivity {
         });
 
         forImport.setOnClickListener(v -> {
-            String Imp = "Import";
-            ImportExport(Imp);
+            ActivityResultLauncher<String> openFileLauncher =
+                    getActivityResultRegistry().register("open_file", new OpenDocumentContract(), new ActivityResultCallback<Uri>() {
+                        @Override
+                        public void onActivityResult(Uri o) {
+                            try (InputStream inputStream = getContentResolver().openInputStream(o)) {
+                                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                                StringBuilder jsonStringBuilder = new StringBuilder();
+                                String line;
+                                while ((line = reader.readLine()) != null) {
+                                    jsonStringBuilder.append(line);
+                                }
+                                String jsonString = jsonStringBuilder.toString();
+                                Gson gson = new Gson();
+                                Map<String, Object> data = gson.fromJson(jsonString, Map.class);
+                                myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child("New Subject").setValue(data);
+
+                            } catch (IOException e) {
+                                // Handle errors
+                            }
+                        }
+                    });
+            openFileLauncher.launch("application/json");
         });
         
         forExport.setOnClickListener(v -> {
-            String Exp = "Export";
-            ImportExport(Exp);
+            // Inflate the custom layout
+            LayoutInflater inflater = getLayoutInflater();
+            View dialogView = inflater.inflate(R.layout.dialog_importexport, null);
+
+            // Create an AlertDialog.Builder
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+            // Set the custom view
+            builder.setView(dialogView);
+
+            // Get references to UI elements
+            Button ExportButton = dialogView.findViewById(R.id.dialog_importexport);
+            EditText SubjectTitle = dialogView.findViewById(R.id.dialog_get_importexport);
+
+            // Show the dialog
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+            ExportButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String Acc = theIntent.getStringExtra("Fname");
+                    String Sub = SubjectTitle.getText().toString();
+                    SubjectChecking(Acc, Sub, new BooleanCallback() {
+                        @Override
+                        public void onCheckComplete(boolean exists) {
+                            if (exists) {
+                                ActivityResultLauncher<String> createFileLauncher =
+                                        getActivityResultRegistry().register("create_file", new CreateDocumentContract(), new ActivityResultCallback<Uri>() {
+                                            @Override
+                                            public void onActivityResult(Uri o) {
+                                                myRef.child(theIntent.getStringExtra("Fname"))
+                                                        .child("Notebook")
+                                                        .child(Sub)
+                                                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                                                                String json = gson.toJson(snapshot.getValue());
+                                                                try (OutputStream outputStream = getContentResolver().openOutputStream(o)) {
+                                                                    outputStream.write(json.getBytes());
+                                                                }
+                                                                catch (IOException e) {
+                                                                    Log.e("TAG", "Error writing to file: " + e.getMessage());
+                                                                }
+                                                            }
+                                                            @Override
+                                                            public void onCancelled(@NonNull DatabaseError error) {
+                                                            }
+                                                        });
+                                            }
+                                        });
+                                createFileLauncher.launch("application/json");
+                            }
+                            dialog.dismiss();
+                        }
+                    });
+                }
+            });
         });
     }
 
@@ -515,90 +593,30 @@ public class Notebook extends AppCompatActivity {
         });
     }
 
-    private void ImportExport (String IE) {
-        // Inflate the custom layout
-        LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.dialog_importexport, null);
-
-        // Create an AlertDialog.Builder
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        // Set the custom view
-        builder.setView(dialogView);
-
-        // Get references to UI elements
-        Button IEButton = dialogView.findViewById(R.id.dialog_importexport);
-        EditText SubjectTitle = dialogView.findViewById(R.id.dialog_get_importexport);
-
-        // Show the dialog
-        AlertDialog dialog = builder.create();
-        dialog.show();
-
-        IEButton.setText(IE);
-
-        IEButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String Acc = theIntent.getStringExtra("Fname");
-                String Sub = SubjectTitle.getText().toString();
-                SubjectChecking(Acc, Sub, new BooleanCallback() {
-                    @Override
-                    public void onCheckComplete(boolean exists) {
-                        if (exists) {
-                            switch (IE) {
-                                case "Import":
-                                    break;
-                                case "Export":
-                                    Log.d("Export", "Export");
-                                    ActivityResultLauncher<String> createFileLauncher =
-                                            getActivityResultRegistry().register("create_file", new CreateDocumentContract(), new ActivityResultCallback<Uri>() {
-                                                @Override
-                                                public void onActivityResult(Uri o) {
-                                                    try (OutputStream outputStream = getContentResolver().openOutputStream(o)) {
-                                                        myRef.child(theIntent.getStringExtra("Fname"))
-                                                                .child("Notebook")
-                                                                .child(Sub)
-                                                                .addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                    @Override
-                                                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                                        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                                                                        String json = gson.toJson(snapshot.getValue());
-                                                                        try (OutputStream outputStream = getContentResolver().openOutputStream(o)) {
-                                                                            outputStream.write(json.getBytes());
-                                                                        } catch (IOException e) {
-                                                                            Log.e("TAG", "Error writing to file: " + e.getMessage());
-                                                                        }
-                                                                    }
-
-                                                                    @Override
-                                                                    public void onCancelled(@NonNull DatabaseError error) {
-
-                                                                    }
-
-                                                                });
-                                                    }
-                                                    catch (IOException e) {
-
-                                                    }
-                                                }
-                                            });
-                                    createFileLauncher.launch("application/json");
-                                    break;
-                            }
-                            dialog.dismiss();
-                        }
-                        dialog.dismiss();
-                    }
-                });
-            }
-        });
-    }
-
     public class CreateDocumentContract extends ActivityResultContract<String, Uri> {
 
         @Override
         public Intent createIntent(@NonNull Context context, String input) {
             return new Intent(Intent.ACTION_CREATE_DOCUMENT)
+                    .setType(input)
+                    .addCategory(Intent.CATEGORY_OPENABLE);
+        }
+
+        @Nullable
+        @Override
+        public Uri parseResult(int resultCode, @Nullable Intent intent) {
+            if (resultCode == Activity.RESULT_OK && intent != null) {
+                return intent.getData();
+            }
+            return null;
+        }
+    }
+
+    public class OpenDocumentContract extends ActivityResultContract<String, Uri> {
+
+        @Override
+        public Intent createIntent(@NonNull Context context, String input) {
+            return new Intent(Intent.ACTION_OPEN_DOCUMENT)
                     .setType(input)
                     .addCategory(Intent.CATEGORY_OPENABLE);
         }
