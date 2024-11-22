@@ -3,31 +3,46 @@ package com.example.adet;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.SurfaceTexture;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Surface;
+import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContract;
+
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.core.CameraSelector;
+import androidx.camera.core.ImageCapture;
+import androidx.camera.core.Preview;
+import androidx.camera.lifecycle.ProcessCameraProvider;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.adet.databinding.ActivityMainBinding;
+import com.example.adet.databinding.ActivityNotebookBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -41,18 +56,46 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import android.Manifest;
+import android.widget.Toast;
 
 public class Notebook extends AppCompatActivity {
 
     private LinearLayout content_Container;
-    private ImageView goto_sidemenu;
+    private ImageView goto_sidemenu, camScan;
     private Button Add, Edit, Delete, forImport, forExport;
     private Intent theIntent;
+    private View preview;
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("Name List");
+
+    private ActivityNotebookBinding viewBinding;
+    private ImageCapture imageCapture = null;
+    private ExecutorService cameraExecutor;
+    private static final String TAG = "CameraXApp";
+    private static final String FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS";
+    private static final String[] REQUIRED_PERMISSIONS;
+
+    static {
+        List<String> permissionsList = new ArrayList<>();
+        permissionsList.add(Manifest.permission.CAMERA);
+        permissionsList.add(Manifest.permission.RECORD_AUDIO);
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+            permissionsList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+        REQUIRED_PERMISSIONS = permissionsList.toArray(new String[0]);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +116,9 @@ public class Notebook extends AppCompatActivity {
         Delete = findViewById(R.id.notebookDelete);
         forImport = findViewById(R.id.forImport);
         forExport = findViewById(R.id.forExport);
+        camScan = findViewById(R.id.camscan);
+        preview = findViewById(R.id.previewView);
+        preview.setVisibility(View.INVISIBLE);
 
         //Display all data
         myRef.child(theIntent.getStringExtra("Fname"))
@@ -451,6 +497,7 @@ public class Notebook extends AppCompatActivity {
             });
         });
 
+        //Import Subject
         forImport.setOnClickListener(v -> {
             ActivityResultLauncher<String> openFileLauncher =
                     getActivityResultRegistry().register("open_file", new OpenDocumentContract(), new ActivityResultCallback<Uri>() {
@@ -475,7 +522,8 @@ public class Notebook extends AppCompatActivity {
                     });
             openFileLauncher.launch("application/json");
         });
-        
+
+        //Export Subject
         forExport.setOnClickListener(v -> {
             // Inflate the custom layout
             LayoutInflater inflater = getLayoutInflater();
@@ -531,11 +579,39 @@ public class Notebook extends AppCompatActivity {
                                         });
                                 createFileLauncher.launch("application/json");
                             }
+                            else {
+                                AlertDialog alertDialog = new AlertDialog.Builder(Notebook.this).create();
+                                alertDialog.setTitle("Error");
+                                alertDialog.setMessage("Subject does not exist");
+                                alertDialog.show();
+                            }
                             dialog.dismiss();
                         }
                     });
                 }
             });
+        });
+
+
+        //CamScan
+        camScan.setOnClickListener(v -> {
+            viewBinding = ActivityNotebookBinding.inflate(getLayoutInflater());
+            setContentView(viewBinding.getRoot());
+
+            if (allPermissionsGranted()) {
+                startCamera();
+            } else {
+                requestPermissions();
+            }
+
+            viewBinding.camscan.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    takePhoto();
+                }
+            });
+
+            cameraExecutor = Executors.newSingleThreadExecutor();
         });
     }
 
@@ -552,7 +628,6 @@ public class Notebook extends AppCompatActivity {
             }
         });
     }
-
     private void SubjectChecking(String Acc, String Subject, BooleanCallback booleanCallback) {
         myRef.child(Acc).child("Notebook").child(Subject).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
@@ -572,7 +647,6 @@ public class Notebook extends AppCompatActivity {
             }
         });
     }
-
     private void TopicChecking(String Acc, String Subject, String Topic, BooleanCallback booleanCallback) {
         myRef.child(Acc).child("Notebook").child(Subject).child(Topic).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
@@ -593,7 +667,72 @@ public class Notebook extends AppCompatActivity {
         });
     }
 
+    private void takePhoto() {
+        // Implementation for taking a photo
+    }
+    private void startCamera() {
+        preview.setVisibility(View.VISIBLE);
+        final ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
+
+        cameraProviderFuture.addListener(() -> {
+            try {
+                ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
+
+                // Preview
+                Preview preview = new Preview.Builder().build();
+                preview.setSurfaceProvider(viewBinding.previewView.getSurfaceProvider());
+
+                // Select back camera as a default
+                CameraSelector cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA;
+
+                // Unbind use cases before rebinding
+                cameraProvider.unbindAll();
+
+                // Bind use cases to camera
+                cameraProvider.bindToLifecycle(this, cameraSelector, preview);
+
+            } catch (ExecutionException | InterruptedException exc) {
+                Log.e(TAG, "Use case binding failed", exc);
+            }}, ContextCompat.getMainExecutor(this));
+    }
+    private void requestPermissions() {
+        activityResultLauncher.launch(REQUIRED_PERMISSIONS);
+    }
+    private boolean allPermissionsGranted() {
+        for(String permission : REQUIRED_PERMISSIONS) {
+            if (ContextCompat.checkSelfPermission(getBaseContext(), permission) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        cameraExecutor.shutdown();
+    }
+
+    private ActivityResultLauncher<String[]> activityResultLauncher =
+            registerForActivityResult(
+                    new ActivityResultContracts.RequestMultiplePermissions(),
+                    result -> {
+                        // Handle Permission granted/rejected
+                        boolean permissionGranted = true;
+                        for (Map.Entry<String, Boolean> entry :result.entrySet()) {
+                            if (Arrays.asList(REQUIRED_PERMISSIONS).contains(entry.getKey()) && !entry.getValue()) {
+                                permissionGranted = false;
+                                break; // Exit loop if any required permission is denied
+                            }
+                        }
+                        if (!permissionGranted) {
+                            Toast.makeText(getBaseContext(), "Permission request denied", Toast.LENGTH_SHORT).show();
+                        } else {
+                            startCamera();
+                        }
+                    });
+
     public class CreateDocumentContract extends ActivityResultContract<String, Uri> {
+
 
         @Override
         public Intent createIntent(@NonNull Context context, String input) {
@@ -601,7 +740,6 @@ public class Notebook extends AppCompatActivity {
                     .setType(input)
                     .addCategory(Intent.CATEGORY_OPENABLE);
         }
-
         @Nullable
         @Override
         public Uri parseResult(int resultCode, @Nullable Intent intent) {
@@ -610,9 +748,10 @@ public class Notebook extends AppCompatActivity {
             }
             return null;
         }
-    }
 
+    }
     public class OpenDocumentContract extends ActivityResultContract<String, Uri> {
+
 
         @Override
         public Intent createIntent(@NonNull Context context, String input) {
@@ -620,7 +759,6 @@ public class Notebook extends AppCompatActivity {
                     .setType(input)
                     .addCategory(Intent.CATEGORY_OPENABLE);
         }
-
         @Nullable
         @Override
         public Uri parseResult(int resultCode, @Nullable Intent intent) {
@@ -629,5 +767,6 @@ public class Notebook extends AppCompatActivity {
             }
             return null;
         }
+
     }
 }
