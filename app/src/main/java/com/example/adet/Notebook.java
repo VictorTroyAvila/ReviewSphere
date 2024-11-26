@@ -1,6 +1,7 @@
 package com.example.adet;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -9,6 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
@@ -30,7 +32,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
+import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageCapture;
+import androidx.camera.core.ImageCaptureException;
+import androidx.camera.core.ImageProxy;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.core.content.ContextCompat;
@@ -50,6 +55,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.googlecode.tesseract.android.TessBaseAPI;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -57,10 +63,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 
+import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -72,30 +81,14 @@ import android.widget.Toast;
 public class Notebook extends AppCompatActivity {
 
     private LinearLayout content_Container;
-    private ImageView goto_sidemenu, camScan;
+    private ImageView goto_sidemenu, camScan, takePhoto;
     private Button Add, Edit, Delete, forImport, forExport;
     private Intent theIntent;
-    private View preview;
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("Name List");
 
-    private ActivityNotebookBinding viewBinding;
-    private ImageCapture imageCapture = null;
-    private ExecutorService cameraExecutor;
-    private static final String TAG = "CameraXApp";
-    private static final String FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS";
-    private static final String[] REQUIRED_PERMISSIONS;
-
-    static {
-        List<String> permissionsList = new ArrayList<>();
-        permissionsList.add(Manifest.permission.CAMERA);
-        permissionsList.add(Manifest.permission.RECORD_AUDIO);
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-            permissionsList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        }
-        REQUIRED_PERMISSIONS = permissionsList.toArray(new String[0]);
-    }
+    private TessBaseAPI tessBaseAPI;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,8 +110,43 @@ public class Notebook extends AppCompatActivity {
         forImport = findViewById(R.id.forImport);
         forExport = findViewById(R.id.forExport);
         camScan = findViewById(R.id.camscan);
-        preview = findViewById(R.id.previewView);
-        preview.setVisibility(View.INVISIBLE);
+
+        if (theIntent.getStringExtra("imgtext") != null) {
+            // Inflate the custom layout
+            LayoutInflater inflater = getLayoutInflater();
+            View dialogView = inflater.inflate(R.layout.dialog_imgtext_save, null);
+
+            // Create an AlertDialog.Builder
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+            // Set the custom view
+            builder.setView(dialogView);
+
+            // Get references to UI elements
+            EditText subjectTitle = dialogView.findViewById(R.id.dialog_imgtext_subjecttitle);
+            EditText topicTitle = dialogView.findViewById(R.id.dialog_imgtext_topictitle);
+            EditText camscan = dialogView.findViewById(R.id.dialog_imgtext_camscan);
+            Button submitButton = dialogView.findViewById(R.id.dialog_save_camscan);
+            camscan.setText(theIntent.getStringExtra("imgtext"));
+
+            // Show the dialog
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+            submitButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    myRef.child(theIntent.getStringExtra("Fname"))
+                            .child("Notebook")
+                            .child(subjectTitle.getText().toString())
+                            .child(topicTitle.getText().toString())
+                            .child("Items")
+                            .child("Term")
+                            .setValue(camscan.getText().toString());
+                    dialog.dismiss();
+                }
+            });
+        }
 
         //Display all data
         myRef.child(theIntent.getStringExtra("Fname"))
@@ -595,23 +623,9 @@ public class Notebook extends AppCompatActivity {
 
         //CamScan
         camScan.setOnClickListener(v -> {
-            viewBinding = ActivityNotebookBinding.inflate(getLayoutInflater());
-            setContentView(viewBinding.getRoot());
-
-            if (allPermissionsGranted()) {
-                startCamera();
-            } else {
-                requestPermissions();
-            }
-
-            viewBinding.camscan.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    takePhoto();
-                }
-            });
-
-            cameraExecutor = Executors.newSingleThreadExecutor();
+            Intent intent = new Intent(Notebook.this, CamScan.class);
+            intent.putExtra("Fname", theIntent.getStringExtra("Fname"));
+            startActivity(intent);
         });
     }
 
@@ -666,71 +680,6 @@ public class Notebook extends AppCompatActivity {
             }
         });
     }
-
-    private void takePhoto() {
-        // Implementation for taking a photo
-    }
-    private void startCamera() {
-        preview.setVisibility(View.VISIBLE);
-        final ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
-
-        cameraProviderFuture.addListener(() -> {
-            try {
-                ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
-
-                // Preview
-                Preview preview = new Preview.Builder().build();
-                preview.setSurfaceProvider(viewBinding.previewView.getSurfaceProvider());
-
-                // Select back camera as a default
-                CameraSelector cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA;
-
-                // Unbind use cases before rebinding
-                cameraProvider.unbindAll();
-
-                // Bind use cases to camera
-                cameraProvider.bindToLifecycle(this, cameraSelector, preview);
-
-            } catch (ExecutionException | InterruptedException exc) {
-                Log.e(TAG, "Use case binding failed", exc);
-            }}, ContextCompat.getMainExecutor(this));
-    }
-    private void requestPermissions() {
-        activityResultLauncher.launch(REQUIRED_PERMISSIONS);
-    }
-    private boolean allPermissionsGranted() {
-        for(String permission : REQUIRED_PERMISSIONS) {
-            if (ContextCompat.checkSelfPermission(getBaseContext(), permission) != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
-        }
-        return true;
-    }
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        cameraExecutor.shutdown();
-    }
-
-    private ActivityResultLauncher<String[]> activityResultLauncher =
-            registerForActivityResult(
-                    new ActivityResultContracts.RequestMultiplePermissions(),
-                    result -> {
-                        // Handle Permission granted/rejected
-                        boolean permissionGranted = true;
-                        for (Map.Entry<String, Boolean> entry :result.entrySet()) {
-                            if (Arrays.asList(REQUIRED_PERMISSIONS).contains(entry.getKey()) && !entry.getValue()) {
-                                permissionGranted = false;
-                                break; // Exit loop if any required permission is denied
-                            }
-                        }
-                        if (!permissionGranted) {
-                            Toast.makeText(getBaseContext(), "Permission request denied", Toast.LENGTH_SHORT).show();
-                        } else {
-                            startCamera();
-                        }
-                    });
-
     public class CreateDocumentContract extends ActivityResultContract<String, Uri> {
 
 
