@@ -196,6 +196,7 @@ public class Quiz extends AppCompatActivity {
                                 LinearLayout.LayoutParams.WRAP_CONTENT
                         );
                         radioGroup.setLayoutParams(radioGroupLayoutParams);
+                        radioGroup.setOrientation(LinearLayout.VERTICAL);
 
                         // Create Radio Buttons
                         RadioButton radioButton1 = new RadioButton(this);
@@ -237,7 +238,7 @@ public class Quiz extends AppCompatActivity {
 
                             if (j == correctAnswerIndex) {
                                 currentButton.setText(stringTerm); // Set correct answer
-                            } else {currentButton.setText(optionsList.get(index)); // Set other options
+                            } else {currentButton.setText(optionsList.get(indexx)); // Set other options
                             }
                         }
 
