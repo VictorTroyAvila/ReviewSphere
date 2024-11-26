@@ -1,11 +1,14 @@
 package com.example.adet;
 
+import static com.google.common.collect.ComparisonChain.start;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -143,33 +146,37 @@ public class TrueOrFalse extends AppCompatActivity {
     }
     private void ReturnValues(ArrayList <String> termList, ArrayList <String> definitionList, int index) {
 
-        final int[] rndIndex = {randomizingIndex(index)};
-        final int[] rndIndex2 = {randomizingIndex(index)};
+        final int[] rndIndex4Def = {randomizingIndex(index)};
+        final int[] rndIndex4Term = {randomizingIndex(index)};
 
-        Term = termList.get(rndIndex2[0]);
-        Definition = definitionList.get(rndIndex[0]);
+        Term = termList.get(rndIndex4Term[0]);
+        Definition = definitionList.get(rndIndex4Def[0]);
 
         QuestionAnswer.setText("Is "+Term+"\n \n"+Definition);
 
         Green.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (checkEqual(rndIndex2[0], rndIndex[0], Term, Definition, termList, definitionList)) {
+                if (checkEqual(rndIndex4Term[0], rndIndex4Def[0], Term, Definition, termList, definitionList)) {
                     counterC++;
                     cCounter.setText(String.valueOf(counterC));
-                    rndIndex[0] = randomizingIndex(index);
-                    rndIndex2[0] = randomizingIndex(index);
-                    Term = termList.get(rndIndex2[0]);
-                    Definition = definitionList.get(rndIndex[0]);
+                    rndIndex4Def[0] = randomizingIndex(index);
+                    rndIndex4Term[0] = randomizingIndex(index);
+                    Term = termList.get(rndIndex4Term[0]);
+                    Definition = definitionList.get(rndIndex4Def[0]);
                     QuestionAnswer.setText("Is "+Term+"\n \n"+Definition);
                 }
                 else {
                     counterW++;
                     wCounter.setText(String.valueOf(counterW));
-                    rndIndex[0] = randomizingIndex(index);
-                    rndIndex2[0] = randomizingIndex(index);
-                    Term = termList.get(rndIndex2[0]);
-                    Definition = definitionList.get(rndIndex[0]);
+
+                    //Show Correct Answer
+                    showCorrectAns(rndIndex4Term[0], termList, definitionList);
+
+                    rndIndex4Def[0] = randomizingIndex(index);
+                    rndIndex4Term[0] = randomizingIndex(index);
+                    Term = termList.get(rndIndex4Term[0]);
+                    Definition = definitionList.get(rndIndex4Def[0]);
                     QuestionAnswer.setText("Is "+Term+"\n \n"+Definition);
                 }
             }
@@ -177,22 +184,26 @@ public class TrueOrFalse extends AppCompatActivity {
         Red.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (checkEqual(rndIndex2[0], rndIndex[0], Term, Definition, termList, definitionList)) {
+                if (checkEqual(rndIndex4Term[0], rndIndex4Def[0], Term, Definition, termList, definitionList)) {
                     counterW++;
                     wCounter.setText(String.valueOf(counterW));
-                    rndIndex[0] = randomizingIndex(index);
-                    rndIndex2[0] = randomizingIndex(index);
-                    Term = termList.get(rndIndex2[0]);
-                    Definition = definitionList.get(rndIndex[0]);
+
+                    //Show Correct Answer
+                    showCorrectAns(rndIndex4Term[0], termList, definitionList);
+
+                    rndIndex4Def[0] = randomizingIndex(index);
+                    rndIndex4Term[0] = randomizingIndex(index);
+                    Term = termList.get(rndIndex4Term[0]);
+                    Definition = definitionList.get(rndIndex4Def[0]);
                     QuestionAnswer.setText("Is "+Term+"\n \n"+Definition);
                 }
                 else {
                     counterC++;
                     cCounter.setText(String.valueOf(counterC));
-                    rndIndex[0] = randomizingIndex(index);
-                    rndIndex2[0] = randomizingIndex(index);
-                    Term = termList.get(rndIndex2[0]);
-                    Definition = definitionList.get(rndIndex[0]);
+                    rndIndex4Def[0] = randomizingIndex(index);
+                    rndIndex4Term[0] = randomizingIndex(index);
+                    Term = termList.get(rndIndex4Term[0]);
+                    Definition = definitionList.get(rndIndex4Def[0]);
                     QuestionAnswer.setText("Is "+Term+"\n \n"+Definition);
                 }
             }
@@ -203,14 +214,35 @@ public class TrueOrFalse extends AppCompatActivity {
         Random random = new Random();
         return random.nextInt(index);
     }
-
-    private boolean checkEqual(int rndIndex2, int rndIndex, String Term, String Definition, ArrayList <String> termList, ArrayList <String> definitionList) {
-        if (Term.equals(termList.get(rndIndex)) && Definition.equals(definitionList.get(rndIndex2))) {
+    private boolean checkEqual(int rndIndex4Term, int rndIndex4Def, String Term, String Definition, ArrayList <String> termList, ArrayList <String> definitionList) {
+        if (Term.equals(termList.get(rndIndex4Def)) && Definition.equals(definitionList.get(rndIndex4Term))) {
             return true;
         }
         else {
             return false;
         }
+    }
+    private void showCorrectAns(int rndIndex4Term, ArrayList <String> termList, ArrayList <String> definitionList) {
+        // Inflate the custom layout
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_showcorrect, null);
+
+        // Create an AlertDialog.Builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        // Set the custom view
+        builder.setView(dialogView);
+
+        // Get references to UI elements
+        TextView correctans = dialogView.findViewById(R.id.dialog_correctans);
+        String correctAns = termList.get(rndIndex4Term);
+        String correctDef = definitionList.get(rndIndex4Term);
+        correctans.setText(correctAns + "\n\n" + correctDef);
+
+        // Show the dialog
+        AlertDialog dialog = builder.create();
+
+        dialog.show();
     }
 
 }

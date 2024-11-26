@@ -172,7 +172,7 @@ public class Matching_Type extends AppCompatActivity {
                 for (int j = 0; j < 5 && (i * 5 + j) < numButtons; j++) {
                     Button button = new Button(this);
                     button.setText(" "); // Initially hide the text
-                    button.setTag(allOptions.get(i * 5 +j)); // Store the actual text in the tag
+                    button.setTag(allOptions.get(i * 5 + j)); // Store the actual text in the tag
                     button.setBackground(getResources().getDrawable(R.drawable.planet_3__1_));
 
                     int widthInDp = 75;
@@ -197,7 +197,6 @@ public class Matching_Type extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
     private void handleButtonClick(Button button) {
         Selected1.setVisibility(View.VISIBLE);
         Selected2.setVisibility(View.VISIBLE);
@@ -211,7 +210,6 @@ public class Matching_Type extends AppCompatActivity {
             checkMatch();
         }
     }
-
     private void checkMatch() {
         String text1 = selectedButton1.getTag().toString();
         String text2 = selectedButton2.getTag().toString();

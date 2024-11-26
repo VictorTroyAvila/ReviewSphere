@@ -64,79 +64,82 @@ public class Topic_Selection extends AppCompatActivity {
                         for (DataSnapshot subjectSnapshot : snapshot.getChildren()) {
                             //Topic
                             for (DataSnapshot topicSnapshot : subjectSnapshot.getChildren()) {
-                                String Subject = subjectSnapshot.getKey();
-                                String Topic = topicSnapshot.getKey();
+                                int itemcount = (int) topicSnapshot.child("Items").getChildrenCount();
+                                if (itemcount >= 4) {
+                                    String Subject = subjectSnapshot.getKey();
+                                    String Topic = topicSnapshot.getKey();
 
-                                TextView textView = new TextView(Topic_Selection.this);
-                                textView.setText(Subject +
-                                        "\nTopic: " + Topic);
-                                textView.setId(View.generateViewId());
-                                textView.setTextSize(16);
-                                textView.setBackground(getResources().getDrawable(R.drawable.rounding_corner));
-                                textView.setBackgroundColor(getResources().getColor(R.color.faded_purple));
-                                textView.setPadding(32, 32, 32, 32);
+                                    TextView textView = new TextView(Topic_Selection.this);
+                                    textView.setText(Subject +
+                                            "\nTopic: " + Topic);
+                                    textView.setId(View.generateViewId());
+                                    textView.setTextSize(16);
+                                    textView.setBackground(getResources().getDrawable(R.drawable.rounding_corner));
+                                    textView.setBackgroundColor(getResources().getColor(R.color.faded_purple));
+                                    textView.setPadding(32, 32, 32, 32);
 
-                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                                        LinearLayout.LayoutParams.MATCH_PARENT,
-                                        LinearLayout.LayoutParams.WRAP_CONTENT
-                                );
-                                params.setMargins(16, 16, 16, 16);
-                                textView.setLayoutParams(params);
+                                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                            LinearLayout.LayoutParams.MATCH_PARENT,
+                                            LinearLayout.LayoutParams.WRAP_CONTENT
+                                    );
+                                    params.setMargins(16, 16, 16, 16);
+                                    textView.setLayoutParams(params);
 
-                                content_container.addView(textView);
+                                    content_container.addView(textView);
 
-                                textView.setOnClickListener(v -> {
-                                    String val = theIntent.getStringExtra("title");
-                                    switch (val) {
-                                        case "Quizzes":
-                                            Intent intent1 = new Intent(Topic_Selection.this, Quiz.class);
-                                            intent1.putExtra("Fname", theIntent.getStringExtra("Fname"));
-                                            intent1.putExtra("Subject", Subject);
-                                            intent1.putExtra("Topic", Topic);
-
-                                            startActivity(intent1);
-                                            finish();
-                                            break;
-                                        case "FlashCards":
-                                            Intent intent2 = new Intent(Topic_Selection.this, Flashcards.class);
-                                            intent2.putExtra("Fname", theIntent.getStringExtra("Fname"));
-                                            intent2.putExtra("Subject", Subject);
-                                            intent2.putExtra("Topic", Topic);
-                                            AddPlays ();
-                                            startActivity(intent2);
-                                            finish();
-                                            break;
-                                        case "Strips":
-                                            Intent intent3 = new Intent(Topic_Selection.this, Strips.class);
-                                            intent3.putExtra("Fname", theIntent.getStringExtra("Fname"));
-                                            intent3.putExtra("Subject", Subject);
-                                            intent3.putExtra("Topic", Topic);
-                                            AddPlays ();
-                                            startActivity(intent3);
-                                            finish();
-                                            break;
-                                        case "TrueFalse":
-                                            Intent intent4 = new Intent(Topic_Selection.this, TrueOrFalse.class);
-                                            intent4.putExtra("Fname", theIntent.getStringExtra("Fname"));
-                                            intent4.putExtra("Subject", Subject);
-                                            intent4.putExtra("Topic", Topic);
-                                            AddPlays ();
-                                            startActivity(intent4);
-                                            finish();
-                                            break;
-                                        case "Matching":
-                                            Intent intent5 = new Intent(Topic_Selection.this, Matching_Type.class);
-                                            intent5.putExtra("Fname", theIntent.getStringExtra("Fname"));
-                                            intent5.putExtra("Subject", Subject);
-                                            intent5.putExtra("Topic", Topic);
-                                            AddPlays ();
-                                            startActivity(intent5);
-                                            finish();
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                });
+                                    textView.setOnClickListener(v -> {
+                                        String val = theIntent.getStringExtra("title");
+                                        switch (val) {
+                                            case "Quizzes":
+                                                Intent intent1 = new Intent(Topic_Selection.this, Quiz.class);
+                                                intent1.putExtra("Fname", theIntent.getStringExtra("Fname"));
+                                                intent1.putExtra("Subject", Subject);
+                                                intent1.putExtra("Topic", Topic);
+                                                AddPlays();
+                                                startActivity(intent1);
+                                                finish();
+                                                break;
+                                            case "FlashCards":
+                                                Intent intent2 = new Intent(Topic_Selection.this, Flashcards.class);
+                                                intent2.putExtra("Fname", theIntent.getStringExtra("Fname"));
+                                                intent2.putExtra("Subject", Subject);
+                                                intent2.putExtra("Topic", Topic);
+                                                AddPlays ();
+                                                startActivity(intent2);
+                                                finish();
+                                                break;
+                                            case "Strips":
+                                                Intent intent3 = new Intent(Topic_Selection.this, Strips.class);
+                                                intent3.putExtra("Fname", theIntent.getStringExtra("Fname"));
+                                                intent3.putExtra("Subject", Subject);
+                                                intent3.putExtra("Topic", Topic);
+                                                AddPlays ();
+                                                startActivity(intent3);
+                                                finish();
+                                                break;
+                                            case "TrueFalse":
+                                                Intent intent4 = new Intent(Topic_Selection.this, TrueOrFalse.class);
+                                                intent4.putExtra("Fname", theIntent.getStringExtra("Fname"));
+                                                intent4.putExtra("Subject", Subject);
+                                                intent4.putExtra("Topic", Topic);
+                                                AddPlays ();
+                                                startActivity(intent4);
+                                                finish();
+                                                break;
+                                            case "Matching":
+                                                Intent intent5 = new Intent(Topic_Selection.this, Matching_Type.class);
+                                                intent5.putExtra("Fname", theIntent.getStringExtra("Fname"));
+                                                intent5.putExtra("Subject", Subject);
+                                                intent5.putExtra("Topic", Topic);
+                                                AddPlays ();
+                                                startActivity(intent5);
+                                                finish();
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    });
+                                }
                             }
                         }
                     }

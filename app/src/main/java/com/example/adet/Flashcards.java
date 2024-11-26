@@ -25,10 +25,10 @@ import java.util.Random;
 
 public class Flashcards extends AppCompatActivity {
 
-    private TextView QuestionToAnswer, invisTextView, cCounter, wCounter;
+    private TextView QuestionToAnswer, invisTextView, cCounter, wCounter, wrong, correct;
     private Button showAnswer;
     private ConstraintLayout invisConstrain;
-    private ImageView wrong, correct, ekis, sidemenu;
+    private ImageView ekis, sidemenu;
 
     int counterC = 0;
     int counterW = 0;
@@ -55,8 +55,8 @@ public class Flashcards extends AppCompatActivity {
         showAnswer = findViewById(R.id.show_answer);
         invisConstrain = findViewById(R.id.invis_ConstLayout);
         invisTextView = findViewById(R.id.insvis_TextView);
-        wrong = findViewById(R.id.img_wrong);
-        correct = findViewById(R.id.img_correct);
+        wrong = findViewById(R.id.txt_wrong);
+        correct = findViewById(R.id.txt_correct);
         cCounter = findViewById(R.id.correct_counter);
         wCounter = findViewById(R.id.wrong_counter);
         ekis = findViewById(R.id.Eks);
@@ -204,7 +204,6 @@ public class Flashcards extends AppCompatActivity {
     }
 
     private int randomizingIndex(int index) {
-        Random random = new Random();
         return random.nextInt(index);
     }
 

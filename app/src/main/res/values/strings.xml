@@ -65,6 +65,11 @@
     <string name="plays">Plays</string>
     <string name="forimport">Import</string>
     <string name="forexport">Export</string>
+    <string name="pick1">1st Pick</string>
+    <string name="pick2">2nd Pick</string>
+    <string name="mastered">Mastered</string>
+    <string name="learning">Learning</string>
+    <string name="name">Name</string>
 
     <string-array name="gender">
         <item>Male</item>
