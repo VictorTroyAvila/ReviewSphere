@@ -492,34 +492,50 @@ public class Notebook extends AppCompatActivity {
             DeleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String SubjectTitle = subjectTitle.getText().toString();
-                    String TopicTitle = topicTitle.getText().toString();
+                    String SubjectTitle = subjectTitle.getText().toString().replaceAll("\\s$","");
+                    String TopicTitle = topicTitle.getText().toString().replaceAll("\\s$","");
 
-                    SubjectChecking(theIntent.getStringExtra("Fname"), SubjectTitle, new BooleanCallback() {
-                        @Override
-                        public void onCheckComplete(boolean exists) {
-                            //If Subject Exists
-                            if (exists) {
-                               myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(SubjectTitle).removeValue();
-                            }
-                            else {
-                                TopicChecking(theIntent.getStringExtra("Fname"), SubjectTitle, TopicTitle, new BooleanCallback() {
-                                    @Override
-                                    public void onCheckComplete(boolean exists) {
-                                        if (exists) {
-                                            myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(SubjectTitle).child(TopicTitle).removeValue();
-                                        }
-                                        else {
-                                            AlertDialog alertDialog = new AlertDialog.Builder(Notebook.this).create();
-                                            alertDialog.setTitle("Error");
-                                            alertDialog.setMessage("Nothing to Delete");
-                                            alertDialog.show();
-                                        }
+                    if (SubjectTitle.isEmpty()) {
+                        AlertDialog alertDialog = new AlertDialog.Builder(Notebook.this).create();
+                        alertDialog.setTitle("Error");
+                        alertDialog.setMessage("Subject Title is Required");
+                        alertDialog.show();
+                    }
+                    else {
+                        SubjectChecking(theIntent.getStringExtra("Fname"), SubjectTitle, new BooleanCallback() {
+                            @Override
+                            public void onCheckComplete(boolean exists) {
+                                //If Subject Exists
+                                if (exists) {
+                                    if (TopicTitle.isEmpty()) {
+                                        myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(SubjectTitle).removeValue();
                                     }
-                                });
+                                    else {
+                                        TopicChecking(theIntent.getStringExtra("Fname"), SubjectTitle, TopicTitle, new BooleanCallback() {
+                                            @Override
+                                            public void onCheckComplete(boolean exists) {
+                                                if (exists) {;
+                                                    myRef.child(theIntent.getStringExtra("Fname")).child("Notebook").child(SubjectTitle).child(TopicTitle).removeValue();
+                                                }
+                                                else {
+                                                    AlertDialog alertDialog = new AlertDialog.Builder(Notebook.this).create();
+                                                    alertDialog.setTitle("Error");
+                                                    alertDialog.setMessage("Topic does not exist");
+                                                    alertDialog.show();
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                                else {
+                                    AlertDialog alertDialog = new AlertDialog.Builder(Notebook.this).create();
+                                    alertDialog.setTitle("Error");
+                                    alertDialog.setMessage("Subject does not exist");
+                                    alertDialog.show();
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                     dialog.dismiss();
                 }
             });
