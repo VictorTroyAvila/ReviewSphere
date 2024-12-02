@@ -1,5 +1,6 @@
 package com.example.adet;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -202,13 +203,33 @@ public class Accounts extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<DataSnapshot> task) {
                             if (task.isSuccessful()) {
-                                Object data = task.getResult().getValue();
-                                myRef.child(newFname).setValue(data);
+                                // Inflate the custom layout
+                                LayoutInflater inflater = getLayoutInflater();
+                                View dialogView = inflater.inflate(R.layout.dialog_msgrestart, null);
+
+                                // Create an AlertDialog.Builder
+                                AlertDialog.Builder builder = new AlertDialog.Builder(Accounts.this);
+
+                                // Set the custom view
+                                builder.setView(dialogView);
+
+                                // Show the dialog
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+
+                                dialog.setOnDismissListener( new DialogInterface.OnDismissListener() {
+                                    @Override
+                                    public void onDismiss(DialogInterface dialog) {
+                                        Object data = task.getResult().getValue();
+                                        myRef.child(newFname).setValue(data);
+                                        myRef.child(theIntent.getStringExtra("Fname")).removeValue();
+
+                                        finishAffinity();
+                                    }
+                                });
                             }
                         }
                     });
-
-
 
                     dialog.dismiss();
                 }
