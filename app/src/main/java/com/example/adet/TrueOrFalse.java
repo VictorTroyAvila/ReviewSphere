@@ -75,6 +75,39 @@ public class TrueOrFalse extends AppCompatActivity {
         String Topic = theIntent.getStringExtra("Topic");
 
         if (Fname != null && Subject != null && Topic != null){
+            String game = "TrueFalse";
+            Achievements achievements = new Achievements(game, theIntent);
+            achievements.getAchievement(game, Fname, new StringCallback() {
+                @Override
+                public void onStringRetrieved(String achievement) {
+                    if (achievement != null) {
+                        myRef.child(Fname)
+                                .child("Achievements")
+                                .child(game)
+                                .child(achievement)
+                                .setValue(true);
+
+                        // Inflate the custom layout
+                        LayoutInflater inflater = getLayoutInflater();
+                        View dialogView = inflater.inflate(R.layout.dialog_msg, null);
+
+                        // Create an AlertDialog.Builder
+                        AlertDialog.Builder builder = new AlertDialog.Builder(TrueOrFalse.this);
+
+                        // Set the custom view
+                        builder.setView(dialogView);
+
+                        // Get references to UI elements
+                        TextView msg = dialogView.findViewById(R.id.textView25);
+                        msg.setText("Congratulations! You have earned the " + achievement + " Title!");
+
+                        // Show the dialog
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+                    }
+                }
+            });
+
             myRef.child(theIntent.getStringExtra("Fname"))
                     .child("Notebook")
                     .child(theIntent.getStringExtra("Subject"))

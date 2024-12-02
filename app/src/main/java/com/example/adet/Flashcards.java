@@ -2,13 +2,16 @@ package com.example.adet;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -16,6 +19,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -67,6 +72,40 @@ public class Flashcards extends AppCompatActivity {
         String Topic = theIntent.getStringExtra("Topic");
 
         if (Fname != null && Subject != null && Topic != null){
+            String game = "FlashCards";
+            Achievements achievements = new  Achievements(game, theIntent);
+            achievements.getAchievement(game, Fname, new StringCallback() {
+                @Override
+                public void onStringRetrieved(String achievement) {
+                    if (achievement != null) {
+                        myRef.child(Fname)
+                                .child("Achievements")
+                                .child("Flashcards")
+                                .child(achievement)
+                                .setValue(true);
+
+                        // Inflate the custom layout
+                        LayoutInflater inflater = getLayoutInflater();
+                        View dialogView = inflater.inflate(R.layout.dialog_msg, null);
+
+                        // Create an AlertDialog.Builder
+                        AlertDialog.Builder builder = new AlertDialog.Builder(Flashcards.this);
+
+                        // Set the custom view
+                        builder.setView(dialogView);
+
+                        // Get references to UI elements
+                        TextView msg = dialogView.findViewById(R.id.textView25);
+                        msg.setText("Congratulations! You have earned the " + achievement + " Title!");
+
+                        // Show the dialog
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+                    }
+                }
+            });
+
+
             myRef.child(theIntent.getStringExtra("Fname"))
                     .child("Notebook")
                     .child(theIntent.getStringExtra("Subject"))
@@ -138,7 +177,6 @@ public class Flashcards extends AppCompatActivity {
         });
 
     }
-
     private void ReturnValues(ArrayList <String> termList, ArrayList <String> definitionList, int index) {
         int[] rndIndex = new int[1];
         rndIndex[0] = randomizingIndex(index);
@@ -202,11 +240,9 @@ public class Flashcards extends AppCompatActivity {
             }
         });
     }
-
     private int randomizingIndex(int index) {
         return random.nextInt(index);
     }
-
     private boolean checkEqual(String ans, ArrayList <String> definitionList, int index) {
         if (ans.equalsIgnoreCase(definitionList.get(index))) {
             return true;

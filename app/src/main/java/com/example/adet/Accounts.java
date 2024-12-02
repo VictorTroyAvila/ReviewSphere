@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -22,12 +23,14 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class Accounts extends AppCompatActivity {
 
-    TextView Flashcard_plays, Matching_plays, Quiz_plays, Strips_plays, ToF_plays, Name, School, Age, Gender;
+    TextView Flashcard_plays, Matching_plays, Quiz_plays, Strips_plays, ToF_plays, Name, School, Age, Gender, Player_Title;
     Button editProfile;
 
     Intent theIntent;
@@ -57,8 +60,36 @@ public class Accounts extends AppCompatActivity {
         Age = findViewById(R.id.Age);
         Gender = findViewById(R.id.Gender);
         editProfile = findViewById(R.id.dialog_edit_profile);
+        Player_Title = findViewById(R.id.playerTitle);
+
+        TitleChecking(theIntent.getStringExtra("Fname"), new BooleanCallback() {
+            @Override
+            public void onCheckComplete(boolean exists) {
+                if (exists) {
+                    myRef.child(theIntent.getStringExtra("Fname"))
+                            .child("User Info")
+                            .child("Title")
+                            .addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    Player_Title.setText(snapshot.getValue(String.class));
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
+                }
+                else {
+                    Player_Title.setText("Newbie");
+                }
+            }
+        });
+
 
         Name.setText("Name: " + theIntent.getStringExtra("Fname"));
+
         myRef.child(theIntent.getStringExtra("Fname"))
                 .child("User Info")
                 .child("School")
@@ -205,7 +236,7 @@ public class Accounts extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 // Inflate the custom layout
                                 LayoutInflater inflater = getLayoutInflater();
-                                View dialogView = inflater.inflate(R.layout.dialog_msgrestart, null);
+                                View dialogView = inflater.inflate(R.layout.dialog_msg, null);
 
                                 // Create an AlertDialog.Builder
                                 AlertDialog.Builder builder = new AlertDialog.Builder(Accounts.this);
@@ -234,6 +265,212 @@ public class Accounts extends AppCompatActivity {
                     dialog.dismiss();
                 }
             });
+        });
+
+        Player_Title.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Inflate the custom layout
+                LayoutInflater inflater = getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.dialog_achievements, null);
+
+                // Create an AlertDialog.Builder
+                AlertDialog.Builder builder = new AlertDialog.Builder(Accounts.this);
+
+                // Set the custom view
+                builder.setView(dialogView);
+
+                // Get references to UI elements
+                LinearLayout achievements = dialogView.findViewById(R.id.dialog_title_list);
+
+                // Show the dialog
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+                myRef.child(theIntent.getStringExtra("Fname"))
+                        .child("Achievements")
+                        .child("Flashcards")
+                        .get().addOnSuccessListener(dataSnapshot -> {
+                            dataSnapshot.getChildren().forEach(dataSnapshot1 -> {
+                                if (dataSnapshot1.getValue(Boolean.class)) {
+                                    TextView textView = new TextView(Accounts.this);
+                                    textView.setText(dataSnapshot1.getKey());
+                                    textView.setTextSize(24);
+                                    textView.setClickable(true);
+
+                                    textView.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            myRef.child(theIntent.getStringExtra("Fname"))
+                                                    .child("User Info")
+                                                    .child("Title")
+                                                    .setValue(dataSnapshot1.getKey());
+                                            Player_Title.setText(dataSnapshot1.getKey());
+                                            dialog.dismiss();
+                                        }
+                                    });
+
+                                    achievements.addView(textView);
+                                }
+                                else {
+                                    TextView textView = new TextView(Accounts.this);
+                                    textView.setText(dataSnapshot1.getKey());
+                                    textView.setTextSize(24);
+                                    textView.setAlpha(0.5f);
+                                    achievements.addView(textView);
+                                }
+                            });
+                        });
+                myRef.child(theIntent.getStringExtra("Fname"))
+                        .child("Achievements")
+                        .child("Matching")
+                        .get().addOnSuccessListener(dataSnapshot -> {
+                            dataSnapshot.getChildren().forEach(dataSnapshot1 -> {
+                                if (dataSnapshot1.getValue(Boolean.class)) {
+                                    TextView textView = new TextView(Accounts.this);
+                                    textView.setText(dataSnapshot1.getKey());
+                                    textView.setTextSize(24);
+                                    textView.setClickable(true);
+
+                                    textView.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            myRef.child(theIntent.getStringExtra("Fname"))
+                                                    .child("User Info")
+                                                    .child("Title")
+                                                    .setValue(dataSnapshot1.getKey());
+                                            Player_Title.setText(dataSnapshot1.getKey());
+                                            dialog.dismiss();
+                                        }
+                                    });
+
+                                    achievements.addView(textView);
+                                }
+                                else {
+                                    TextView textView = new TextView(Accounts.this);
+                                    textView.setText(dataSnapshot1.getKey());
+                                    textView.setTextSize(24);
+                                    textView.setAlpha(0.5f);
+                                    achievements.addView(textView);
+                                }
+                            });
+                        });
+                myRef.child(theIntent.getStringExtra("Fname"))
+                        .child("Achievements")
+                        .child("Quizzes")
+                        .get().addOnSuccessListener(dataSnapshot -> {
+                            dataSnapshot.getChildren().forEach(dataSnapshot1 -> {
+                                if (dataSnapshot1.getValue(Boolean.class)) {
+                                    TextView textView = new TextView(Accounts.this);
+                                    textView.setText(dataSnapshot1.getKey());
+                                    textView.setTextSize(24);
+                                    textView.setClickable(true);
+
+                                    textView.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            myRef.child(theIntent.getStringExtra("Fname"))
+                                                    .child("User Info")
+                                                    .child("Title")
+                                                    .setValue(dataSnapshot1.getKey());
+                                            Player_Title.setText(dataSnapshot1.getKey());
+                                            dialog.dismiss();
+                                        }
+                                    });
+
+                                    achievements.addView(textView);
+                                }
+                                else {
+                                    TextView textView = new TextView(Accounts.this);
+                                    textView.setText(dataSnapshot1.getKey());
+                                    textView.setTextSize(24);
+                                    textView.setAlpha(0.5f);
+                                    achievements.addView(textView);
+                                }
+                            });
+                        });
+                myRef.child(theIntent.getStringExtra("Fname"))
+                        .child("Achievements")
+                        .child("Strips")
+                        .get().addOnSuccessListener(dataSnapshot -> {
+                            dataSnapshot.getChildren().forEach(dataSnapshot1 -> {
+                                if (dataSnapshot1.getValue(Boolean.class)) {
+                                    TextView textView = new TextView(Accounts.this);
+                                    textView.setText(dataSnapshot1.getKey());
+                                    textView.setTextSize(24);
+                                    textView.setClickable(true);
+
+                                    textView.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            myRef.child(theIntent.getStringExtra("Fname"))
+                                                    .child("User Info")
+                                                    .child("Title")
+                                                    .setValue(dataSnapshot1.getKey());
+                                            Player_Title.setText(dataSnapshot1.getKey());
+                                            dialog.dismiss();
+                                        }
+                                    });
+
+                                    achievements.addView(textView);
+                                }
+                                else {
+                                    TextView textView = new TextView(Accounts.this);
+                                    textView.setText(dataSnapshot1.getKey());
+                                    textView.setTextSize(24);
+                                    textView.setAlpha(0.5f);
+                                    achievements.addView(textView);
+                                }
+                            });
+                        });
+                myRef.child(theIntent.getStringExtra("Fname"))
+                        .child("Achievements")
+                        .child("TrueFalse")
+                        .get().addOnSuccessListener(dataSnapshot -> {
+                            dataSnapshot.getChildren().forEach(dataSnapshot1 -> {
+                                if (dataSnapshot1.getValue(Boolean.class)) {
+                                    TextView textView = new TextView(Accounts.this);
+                                    textView.setText(dataSnapshot1.getKey());
+                                    textView.setTextSize(24);
+                                    textView.setClickable(true);
+
+                                    textView.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            myRef.child(theIntent.getStringExtra("Fname"))
+                                                    .child("User Info")
+                                                    .child("Title")
+                                                    .setValue(dataSnapshot1.getKey());
+                                            Player_Title.setText(dataSnapshot1.getKey());
+                                            dialog.dismiss();
+                                        }
+                                    });
+
+                                    achievements.addView(textView);
+                                }
+                                else {
+                                    TextView textView = new TextView(Accounts.this);
+                                    textView.setText(dataSnapshot1.getKey());
+                                    textView.setTextSize(24);
+                                    textView.setAlpha(0.5f);
+                                    achievements.addView(textView);
+                                }
+                            });
+                        });
+            }
+        });
+    }
+    private void TitleChecking(String Acc, BooleanCallback booleanCallback) {
+        myRef.child(Acc).child("User Info").child("Title").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (task.isSuccessful()) {
+                    boolean exist = task.getResult().exists();
+                    booleanCallback.onCheckComplete(exist);
+                } else {
+                    booleanCallback.onCheckComplete(false); // Handle error
+                }
+            }
         });
     }
 }
