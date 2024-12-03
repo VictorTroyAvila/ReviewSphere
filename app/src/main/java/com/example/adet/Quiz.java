@@ -43,6 +43,8 @@ public class Quiz extends AppCompatActivity {
     private TextView toScore;
     private LinearLayout content_Container;
 
+    List<Integer> radioGroupID = new ArrayList<>();
+    List<Integer> textViewID = new ArrayList<>();
     List<String> correctAnswers = new ArrayList<>();
     List<String> selectedAnswers = new ArrayList<>();
     Random random = new Random();
@@ -135,10 +137,23 @@ public class Quiz extends AppCompatActivity {
                     if (correctAnswers.get(i).equals(selectedAnswers.get(i))) {
                         correctCount++;
                         toScore.setText("Score: "+correctCount);
+
+                        TextView textView = findViewById(textViewID.get(i));
+                        textView.setTextColor(getResources().getColor(R.color.correct_green));
                     }
                     else
                     {
-                        System.out.println("Ala mali");
+                        TextView textView = findViewById(textViewID.get(i));
+                        textView.setTextColor(getResources().getColor(R.color.wrong_red));
+
+                        RadioGroup radioGroup = findViewById(radioGroupID.get(i));
+                        for (int j = 0; j < radioGroup.getChildCount(); j++) {
+                            RadioButton radioButton = (RadioButton) radioGroup.getChildAt(j);
+                            if (radioButton.getText().toString().equals(correctAnswers.get(i))) {
+                                radioButton.setTextColor(getResources().getColor(R.color.correct_green));
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -214,7 +229,10 @@ public class Quiz extends AppCompatActivity {
                         textView.setPadding(16, 16, 16, 16);
                         textView.setBackground(getResources().getDrawable(R.drawable.rounding_corner_lite));
                         textView.setBackgroundColor(getResources().getColor(R.color.faded_purple));
+                        textViewID.add(textView.getId());
+
                         content_Container.addView(textView);
+
                         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                                 LinearLayout.LayoutParams.WRAP_CONTENT,
                                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -224,6 +242,9 @@ public class Quiz extends AppCompatActivity {
 
                         //Add Radio Group with Linear Layout Params
                         RadioGroup radioGroup = new RadioGroup(this);
+                        radioGroup.setId(View.generateViewId());
+                        radioGroupID.add(radioGroup.getId());
+
                         LinearLayout.LayoutParams radioGroupLayoutParams = new LinearLayout.LayoutParams(
                                 LinearLayout.LayoutParams.WRAP_CONTENT,
                                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -233,20 +254,9 @@ public class Quiz extends AppCompatActivity {
 
                         // Create Radio Buttons
                         RadioButton radioButton1 = new RadioButton(this);
-                        radioButton1.setId(View.generateViewId());
-                        String RB1 = String.valueOf(radioButton1.getId());
-
                         RadioButton radioButton2 = new RadioButton(this);
-                        radioButton2.setId(View.generateViewId());
-                        String RB2 = String.valueOf(radioButton2.getId());
-
                         RadioButton radioButton3 = new RadioButton(this);
-                        radioButton3.setId(View.generateViewId());
-                        String RB3 = String.valueOf(radioButton3.getId());
-
                         RadioButton radioButton4 = new RadioButton(this);
-                        radioButton4.setId(View.generateViewId());
-                        String RB4 = String.valueOf(radioButton4.getId());
 
                         List<String> optionsList = Shuffle(Term);
                         int correctAnswerIndex = random.nextInt(4);

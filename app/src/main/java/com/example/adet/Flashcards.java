@@ -24,6 +24,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.snapshot.Index;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -179,9 +180,16 @@ public class Flashcards extends AppCompatActivity {
     }
     private void ReturnValues(ArrayList <String> termList, ArrayList <String> definitionList, int index) {
         int[] rndIndex = new int[1];
+        final int[] nIndex = {index};
         rndIndex[0] = randomizingIndex(index);
 
         QuestionToAnswer.setText(definitionList.get(rndIndex[0]));
+        showAnswer.setAlpha(1f);
+        wrong.setAlpha(0.5f);
+        correct.setAlpha(0.5f);
+        showAnswer.setEnabled(true);
+        wrong.setEnabled(false);
+        correct.setEnabled(false);
 
         showAnswer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -209,38 +217,66 @@ public class Flashcards extends AppCompatActivity {
         wrong.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                counterW++;
-                wCounter.setText(String.valueOf(counterW));
-                rndIndex[0] = randomizingIndex(index);
-                QuestionToAnswer.setText(definitionList.get(rndIndex[0]));
-                invisConstrain.setVisibility(View.INVISIBLE);
-                showAnswer.setAlpha(1f);
-                wrong.setAlpha(0.5f);
-                correct.setAlpha(0.5f);
-                showAnswer.setEnabled(true);
-                wrong.setEnabled(false);
-                correct.setEnabled(false);
+                if (nIndex[0] == 0 && definitionList == null && termList == null) {
+                    QuestionToAnswer.setText("You have mastered all the flashcards!");
+                    showAnswer.setEnabled(false);
+                    wrong.setEnabled(false);
+                    correct.setEnabled(false);
+                }
+                else {
+                    counterW++;
+                    wCounter.setText(String.valueOf(counterW));
+                    rndIndex[0] = randomizingIndex(nIndex[0]);
+                    QuestionToAnswer.setText(definitionList.get(rndIndex[0]));
+                    invisConstrain.setVisibility(View.INVISIBLE);
+                    showAnswer.setAlpha(1f);
+                    wrong.setAlpha(0.5f);
+                    correct.setAlpha(0.5f);
+                    showAnswer.setEnabled(true);
+                    wrong.setEnabled(false);
+                    correct.setEnabled(false);
+                }
             }
         });
 
         correct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                counterC++;
-                cCounter.setText(String.valueOf(counterC));
-                rndIndex[0] = randomizingIndex(index);
-                QuestionToAnswer.setText(definitionList.get(rndIndex[0]));
-                invisConstrain.setVisibility(View.INVISIBLE);
-                showAnswer.setAlpha(1f);
-                wrong.setAlpha(0.5f);
-                correct.setAlpha(0.5f);
-                showAnswer.setEnabled(true);
-                wrong.setEnabled(false);
-                correct.setEnabled(false);
+                if (nIndex[0] == 1) {
+                    QuestionToAnswer.setText("You have mastered all the flashcards!");
+                    invisConstrain.setVisibility(View.INVISIBLE);
+                    showAnswer.setAlpha(1f);
+                    wrong.setAlpha(0.5f);
+                    correct.setAlpha(0.5f);
+                    showAnswer.setEnabled(true);
+                    wrong.setEnabled(false);
+                    correct.setEnabled(false);
+                }
+                else {
+                    counterC++;
+                    cCounter.setText(String.valueOf(counterC));
+
+                    definitionList.remove(rndIndex[0]);
+                    termList.remove(rndIndex[0]);
+                    nIndex[0]--;
+
+                    rndIndex[0] = randomizingIndex(nIndex[0]);
+                    QuestionToAnswer.setText(definitionList.get(rndIndex[0]));
+                    invisConstrain.setVisibility(View.INVISIBLE);
+                    showAnswer.setAlpha(1f);
+                    wrong.setAlpha(0.5f);
+                    correct.setAlpha(0.5f);
+                    showAnswer.setEnabled(true);
+                    wrong.setEnabled(false);
+                    correct.setEnabled(false);
+                }
             }
         });
     }
     private int randomizingIndex(int index) {
+        if (index == 0) {
+            return 0;
+        }
         return random.nextInt(index);
     }
     private boolean checkEqual(String ans, ArrayList <String> definitionList, int index) {

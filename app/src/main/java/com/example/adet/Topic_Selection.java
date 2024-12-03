@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -54,6 +55,7 @@ public class Topic_Selection extends AppCompatActivity {
         sidemenu = findViewById(R.id.sidemenu);
         content_container = findViewById(R.id.content_container);
 
+        final boolean[] alertShown = {false};
         myRef.child(theIntent.getStringExtra("Fname"))
                 .child("Notebook")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -63,6 +65,7 @@ public class Topic_Selection extends AppCompatActivity {
                         //Subject
                         for (DataSnapshot subjectSnapshot : snapshot.getChildren()) {
                             //Topic
+
                             for (DataSnapshot topicSnapshot : subjectSnapshot.getChildren()) {
                                 int itemcount = (int) topicSnapshot.child("Items").getChildrenCount();
                                 if (itemcount >= 4) {
@@ -140,6 +143,20 @@ public class Topic_Selection extends AppCompatActivity {
                                         }
                                     });
                                 }
+                                else {
+                                    AlertItems(alertShown[0], new BooleanCallback() {
+                                        @Override
+                                        public void onCheckComplete(boolean exists) {
+                                            if (!alertShown[0]) {
+                                                AlertDialog alertDialog = new AlertDialog.Builder(Topic_Selection.this).create();
+                                                alertDialog.setTitle("Note");
+                                                alertDialog.setMessage("4 or more items is required");
+                                                alertDialog.show();
+                                                alertShown[0] = true;
+                                            }
+                                        }
+                                    });
+                                }
                             }
                         }
                     }
@@ -176,5 +193,8 @@ public class Topic_Selection extends AppCompatActivity {
                             .child("No Plays")
                             .setValue(plays);
                 });
+    }
+    private void AlertItems (boolean alertShown, BooleanCallback callback) {
+        callback.onCheckComplete(alertShown);
     }
 }

@@ -40,7 +40,8 @@ public class Strips extends AppCompatActivity {
 
     private int cCounter = 0;
     private int wCounter = 0;
-
+    int counting = 0;
+    int limit = 0;
     Intent theIntent;
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -196,6 +197,14 @@ public class Strips extends AppCompatActivity {
                 wrong.setAlpha(0.5f);
                 correct.setClickable(false);
                 wrong.setClickable(false);
+                s1.setClickable(true);
+                s2.setClickable(true);
+                s3.setClickable(true);
+                s4.setClickable(true);
+                s5.setClickable(true);
+                s6.setClickable(true);
+                s7.setClickable(true);
+                increaseCount(limit);
             }
         });
         wrong.setOnClickListener(new View.OnClickListener() {
@@ -210,6 +219,14 @@ public class Strips extends AppCompatActivity {
                 wrong.setAlpha(0.5f);
                 correct.setClickable(false);
                 wrong.setClickable(false);
+                s1.setClickable(true);
+                s2.setClickable(true);
+                s3.setClickable(true);
+                s4.setClickable(true);
+                s5.setClickable(true);
+                s6.setClickable(true);
+                s7.setClickable(true);
+                increaseCount(limit);
             }
         });
 
@@ -222,6 +239,7 @@ public class Strips extends AppCompatActivity {
             for (int i = 0; i < Defs.size(); i++) {
                 Object element = Defs.get(i);
                 Object element1 = Term.get(i);
+                limit++;
                 if (element instanceof String) {
                     String stringValue = (String) element;
                     String stringValue1 = (String) element1;
@@ -236,6 +254,12 @@ public class Strips extends AppCompatActivity {
                                 showAnswer.setVisibility(View.VISIBLE);
                                 s1.setVisibility(View.INVISIBLE);
                                 s1.setClickable(false);
+                                s2.setClickable(false);
+                                s3.setClickable(false);
+                                s4.setClickable(false);
+                                s5.setClickable(false);
+                                s6.setClickable(false);
+                                s7.setClickable(false);
                                 showAnswer.setClickable(true);
                                 showAnswer.setOnClickListener(new View.OnClickListener() {
                                     @Override
@@ -248,6 +272,7 @@ public class Strips extends AppCompatActivity {
                                         correct.setClickable(true);
                                         wrong.setClickable(true);
                                         shownAnswer.setText(stringValue1);
+
                                     }
                                 });
                                 stripQuestion.setText(stringValue);
@@ -265,6 +290,12 @@ public class Strips extends AppCompatActivity {
                                 showAnswer.setVisibility(View.VISIBLE);
                                 s2.setVisibility(View.INVISIBLE);
                                 s2.setClickable(false);
+                                s1.setClickable(false);
+                                s3.setClickable(false);
+                                s4.setClickable(false);
+                                s5.setClickable(false);
+                                s6.setClickable(false);
+                                s7.setClickable(false);
                                 showAnswer.setClickable(true);
                                 showAnswer.setOnClickListener(new View.OnClickListener() {
                                     @Override
@@ -294,6 +325,12 @@ public class Strips extends AppCompatActivity {
                                 showAnswer.setVisibility(View.VISIBLE);
                                 s3.setVisibility(View.INVISIBLE);
                                 s3.setClickable(false);
+                                s1.setClickable(false);
+                                s2.setClickable(false);
+                                s4.setClickable(false);
+                                s5.setClickable(false);
+                                s6.setClickable(false);
+                                s7.setClickable(false);
                                 showAnswer.setClickable(true);
                                 showAnswer.setOnClickListener(new View.OnClickListener() {
                                     @Override
@@ -306,6 +343,7 @@ public class Strips extends AppCompatActivity {
                                         correct.setClickable(true);
                                         wrong.setClickable(true);
                                         shownAnswer.setText(stringValue1);
+
                                     }
                                 });
                                 stripQuestion.setText(stringValue);
@@ -323,6 +361,12 @@ public class Strips extends AppCompatActivity {
                                 showAnswer.setVisibility(View.VISIBLE);
                                 s4.setVisibility(View.INVISIBLE);
                                 s4.setClickable(false);
+                                s1.setClickable(false);
+                                s2.setClickable(false);
+                                s3.setClickable(false);
+                                s5.setClickable(false);
+                                s6.setClickable(false);
+                                s7.setClickable(false);
                                 showAnswer.setClickable(true);
                                 showAnswer.setOnClickListener(new View.OnClickListener() {
                                     @Override
@@ -335,6 +379,7 @@ public class Strips extends AppCompatActivity {
                                         correct.setClickable(true);
                                         wrong.setClickable(true);
                                         shownAnswer.setText(stringValue1);
+
                                     }
                                 });
                                 stripQuestion.setText(stringValue);
@@ -352,6 +397,12 @@ public class Strips extends AppCompatActivity {
                                 showAnswer.setVisibility(View.VISIBLE);
                                 s5.setVisibility(View.INVISIBLE);
                                 s5.setClickable(false);
+                                s1.setClickable(false);
+                                s2.setClickable(false);
+                                s3.setClickable(false);
+                                s4.setClickable(false);
+                                s6.setClickable(false);
+                                s7.setClickable(false);
                                 showAnswer.setClickable(true);
                                 showAnswer.setOnClickListener(new View.OnClickListener() {
                                     @Override
@@ -364,6 +415,7 @@ public class Strips extends AppCompatActivity {
                                         correct.setClickable(true);
                                         wrong.setClickable(true);
                                         shownAnswer.setText(stringValue1);
+
                                     }
                                 });
                                 stripQuestion.setText(stringValue);
@@ -381,6 +433,12 @@ public class Strips extends AppCompatActivity {
                                 showAnswer.setVisibility(View.VISIBLE);
                                 s6.setVisibility(View.INVISIBLE);
                                 s6.setClickable(false);
+                                s1.setClickable(false);
+                                s2.setClickable(false);
+                                s3.setClickable(false);
+                                s4.setClickable(false);
+                                s5.setClickable(false);
+                                s7.setClickable(false);
                                 showAnswer.setClickable(true);
                                 showAnswer.setOnClickListener(new View.OnClickListener() {
                                     @Override
@@ -393,6 +451,7 @@ public class Strips extends AppCompatActivity {
                                         correct.setClickable(true);
                                         wrong.setClickable(true);
                                         shownAnswer.setText(stringValue1);
+
                                     }
                                 });
                                 stripQuestion.setText(stringValue);
@@ -410,6 +469,12 @@ public class Strips extends AppCompatActivity {
                                 showAnswer.setVisibility(View.VISIBLE);
                                 s7.setVisibility(View.INVISIBLE);
                                 s7.setClickable(false);
+                                s1.setClickable(false);
+                                s2.setClickable(false);
+                                s3.setClickable(false);
+                                s4.setClickable(false);
+                                s5.setClickable(false);
+                                s6.setClickable(false);
                                 showAnswer.setClickable(true);
                                 showAnswer.setOnClickListener(new View.OnClickListener() {
                                     @Override
@@ -422,6 +487,7 @@ public class Strips extends AppCompatActivity {
                                         correct.setClickable(true);
                                         wrong.setClickable(true);
                                         shownAnswer.setText(stringValue1);
+
                                     }
                                 });
                                 stripQuestion.setText(stringValue);
@@ -438,10 +504,17 @@ public class Strips extends AppCompatActivity {
         }
     }
 
+    private void increaseCount (int limit) {
+        counting++;
+        if (counting == limit) {
+            invisConstrain.setVisibility(View.VISIBLE);
+            stripQuestion.setText("You have answered all the questions!");
+        }
+    }
+
     private ArrayList<String> getTerms(ArrayList<String> termList) {
         return termList;
     }
-
     private ArrayList<String> getDefs(ArrayList<String> defList) {
         return defList;
     }
