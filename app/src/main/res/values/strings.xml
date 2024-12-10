@@ -89,4 +89,9 @@
         <item>3rd Year College</item>
         <item>4th Year College</item>
     </string-array>
+    <string-array name="filetype">
+        <item>JSON</item>
+        <item>PDF</item>
+        <item>Docs</item>
+    </string-array>
 </resources>

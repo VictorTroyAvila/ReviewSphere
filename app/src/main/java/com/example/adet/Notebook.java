@@ -3,16 +3,24 @@ package com.example.adet;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -38,25 +46,15 @@ import com.google.gson.GsonBuilder;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 
-import java.nio.ByteBuffer;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import android.Manifest;
-import android.widget.Toast;
 
 public class Notebook extends AppCompatActivity {
 
@@ -562,6 +560,14 @@ public class Notebook extends AppCompatActivity {
             // Get references to UI elements
             Button ExportButton = dialogView.findViewById(R.id.dialog_importexport);
             EditText SubjectTitle = dialogView.findViewById(R.id.dialog_get_importexport);
+            Spinner fileType = dialogView.findViewById(R.id.dialog_filetype);
+
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                    this,
+                    R.array.filetype,
+                    R.layout.customtext_dropdownlist_selecteditem);
+            adapter.setDropDownViewResource(R.layout.customtext_dropdownlist_item);
+            fileType.setAdapter(adapter);
 
             // Show the dialog
             AlertDialog dialog = builder.create();
@@ -572,10 +578,33 @@ public class Notebook extends AppCompatActivity {
                 public void onClick(View v) {
                     String Acc = theIntent.getStringExtra("Fname");
                     String Sub = SubjectTitle.getText().toString();
+                    String Type = fileType.getSelectedItem().toString();
+
                     SubjectChecking(Acc, Sub, new BooleanCallback() {
                         @Override
                         public void onCheckComplete(boolean exists) {
                             if (exists) {
+
+                                String format = "application/json";
+
+                                switch (Type) {
+                                    case "Docs":
+                                        format = "application/msword";
+                                        break;
+                                    case ("PDF"):
+                                        format = "application/pdf";
+                                        break;
+                                    case ("JSON"):
+                                        format = "application/json";
+                                        break;
+                                    default:
+                                        break;
+                                }
+
+                                String finalFile = format;
+                                String finalFile1 = format;
+                                String finalFile2 = format;
+
                                 ActivityResultLauncher<String> createFileLauncher =
                                         getActivityResultRegistry().register("create_file", new CreateDocumentContract(), new ActivityResultCallback<Uri>() {
                                             @Override
@@ -586,13 +615,58 @@ public class Notebook extends AppCompatActivity {
                                                         .addListenerForSingleValueEvent(new ValueEventListener() {
                                                             @Override
                                                             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                                Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                                                                String json = gson.toJson(snapshot.getValue());
-                                                                try (OutputStream outputStream = getContentResolver().openOutputStream(o)) {
-                                                                    outputStream.write(json.getBytes());
+
+                                                                if (finalFile.equals("application/json")) {
+                                                                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                                                                    String json = gson.toJson(snapshot.getValue());
+
+                                                                    try (OutputStream outputStream = getContentResolver().openOutputStream(o)) {
+                                                                        outputStream.write(json.getBytes());
+                                                                    }
+                                                                    catch (IOException e) {
+                                                                        Log.e("TAG", "Error writing to file: " + e.getMessage());
+                                                                    }
                                                                 }
-                                                                catch (IOException e) {
-                                                                    Log.e("TAG", "Error writing to file: " + e.getMessage());
+
+                                                                else if (finalFile1.equals("application/msword")) {
+                                                                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                                                                    String json = gson.toJson(snapshot.getValue());
+                                                                    String wjson = json.replace("{", "")
+                                                                            .replace("}", "")
+                                                                            .replace("\"", "");
+
+                                                                    try (OutputStream outputStream = getContentResolver().openOutputStream(o)) {
+                                                                        outputStream.write(wjson.getBytes());
+                                                                    }
+                                                                    catch (IOException e) {
+                                                                        Log.e("TAG", "Error writing to file: " + e.getMessage());
+                                                                    }
+                                                                }
+
+                                                                else if (finalFile2.equals("application/pdf")) {
+                                                                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                                                                    String json = gson.toJson(snapshot.getValue());
+
+                                                                    PdfDocument pdfDocument = new PdfDocument();
+                                                                    PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(300, 600, 1).create();
+                                                                    PdfDocument.Page page = pdfDocument.startPage(pageInfo);
+                                                                    Canvas canvas = page.getCanvas();
+                                                                    Paint paint = new Paint();
+                                                                    paint.setTextSize(12f);
+                                                                    canvas.drawText(json, 10f, 10f, paint);
+                                                                    pdfDocument.finishPage(page);
+
+                                                                    // Save PDF to external storage
+                                                                    File filePath = new File(
+                                                                            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                                                                            "example.pdf"
+                                                                    );
+                                                                    try {
+                                                                        pdfDocument.writeTo(new FileOutputStream(filePath));
+                                                                    } catch (IOException e) {
+                                                                        e.printStackTrace();
+                                                                    }
+                                                                    pdfDocument.close();
                                                                 }
                                                             }
                                                             @Override
@@ -601,7 +675,7 @@ public class Notebook extends AppCompatActivity {
                                                         });
                                             }
                                         });
-                                createFileLauncher.launch("application/json");
+                                createFileLauncher.launch("" + format);
                             }
                             else {
                                 AlertDialog alertDialog = new AlertDialog.Builder(Notebook.this).create();
@@ -677,7 +751,6 @@ public class Notebook extends AppCompatActivity {
         });
     }
     public class CreateDocumentContract extends ActivityResultContract<String, Uri> {
-
 
         @Override
         public Intent createIntent(@NonNull Context context, String input) {
