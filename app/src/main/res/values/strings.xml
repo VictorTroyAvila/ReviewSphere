@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ADET</string>
+    <string name="app_name">ReviewSphere</string>
     <string name="title">ReviewSphere</string>
     <string name="open_start_btn">Start</string>
     <string name="mode_select">Choose Your Mode</string>
