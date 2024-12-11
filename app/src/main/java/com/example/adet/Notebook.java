@@ -3,12 +3,8 @@ package com.example.adet;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultCallback;
@@ -44,9 +39,13 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.googlecode.tesseract.android.TessBaseAPI;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 
 import java.io.BufferedReader;
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -633,7 +632,8 @@ public class Notebook extends AppCompatActivity {
                                                                     String json = gson.toJson(snapshot.getValue());
                                                                     String wjson = json.replace("{", "")
                                                                             .replace("}", "")
-                                                                            .replace("\"", "");
+                                                                            .replace("\"", "")
+                                                                            .replace(",","\n");
 
                                                                     try (OutputStream outputStream = getContentResolver().openOutputStream(o)) {
                                                                         outputStream.write(wjson.getBytes());
@@ -646,27 +646,28 @@ public class Notebook extends AppCompatActivity {
                                                                 else if (finalFile2.equals("application/pdf")) {
                                                                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                                                                     String json = gson.toJson(snapshot.getValue());
+                                                                    String wjson = json.replace("{", "")
+                                                                            .replace("}", "")
+                                                                            .replace("\"", "")
+                                                                            .replace(",","\n");
 
-                                                                    PdfDocument pdfDocument = new PdfDocument();
-                                                                    PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(300, 600, 1).create();
-                                                                    PdfDocument.Page page = pdfDocument.startPage(pageInfo);
-                                                                    Canvas canvas = page.getCanvas();
-                                                                    Paint paint = new Paint();
-                                                                    paint.setTextSize(12f);
-                                                                    canvas.drawText(json, 10f, 10f, paint);
-                                                                    pdfDocument.finishPage(page);
-
-                                                                    // Save PDF to external storage
-                                                                    File filePath = new File(
-                                                                            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                                                                            "example.pdf"
-                                                                    );
                                                                     try {
-                                                                        pdfDocument.writeTo(new FileOutputStream(filePath));
-                                                                    } catch (IOException e) {
+                                                                        Document document = new Document();
+                                                                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                                                        PdfWriter.getInstance(document, baos);
+                                                                        document.open();
+
+                                                                        document.add(new Paragraph(wjson));
+
+                                                                        document.close();
+
+                                                                        byte[] pdfData = baos.toByteArray();
+
+                                                                        OutputStream outputStream = getContentResolver().openOutputStream(o);
+                                                                        outputStream.write(pdfData);
+                                                                    } catch (Exception e) {
                                                                         e.printStackTrace();
                                                                     }
-                                                                    pdfDocument.close();
                                                                 }
                                                             }
                                                             @Override

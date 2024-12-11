@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.camera.view)
     implementation(libs.camera.extensions)
     implementation(libs.exifinterface)
+    implementation(libs.itextg)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
