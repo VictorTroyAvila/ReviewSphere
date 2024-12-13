@@ -245,10 +245,10 @@ public class Flashcards extends AppCompatActivity {
                 if (nIndex[0] == 1) {
                     QuestionToAnswer.setText("You have mastered all the flashcards!");
                     invisConstrain.setVisibility(View.INVISIBLE);
-                    showAnswer.setAlpha(1f);
+                    showAnswer.setAlpha(0.5f);
                     wrong.setAlpha(0.5f);
                     correct.setAlpha(0.5f);
-                    showAnswer.setEnabled(true);
+                    showAnswer.setEnabled(false);
                     wrong.setEnabled(false);
                     correct.setEnabled(false);
                 }
